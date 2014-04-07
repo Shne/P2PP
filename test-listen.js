@@ -10,7 +10,7 @@ th.init({}, function(err, self){
 		if(err) return console.log('ERROR: ',err);
 		// console.log(packet);
 		// console.log(chan);
-		console.log('New Channel of type "derp" received');
+		// console.log('New Channel of type "derp" received');
 		console.log(chan.inq);
 
 		chan.send({js:{msg:'HURRR'}});
