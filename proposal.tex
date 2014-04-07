@@ -1,0 +1,52 @@
+\documentclass{article}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\begin{document}
+
+\thispagestyle{empty}
+
+\title{Proposal:Secure Chat Messages Via Unstructured Peer-To-Peer Networks}
+\date{\today}
+\author{Jan H. Knudsen (20092926)
+\and
+Roland L. Pedersen (20092817)
+\and
+Kris V. Ebbesen (20094539)
+}
+\maketitle
+
+\section{Use Case}
+
+When one wants to talk about democracy, Chinese cartoons, or other sensitive subjects, one might wish to ensure a certain amount of privacy.
+
+Imagine a North Korean human rights activist group wishing to coordinate their efforts in a fight for freedom. Government agencies are monitoring traffic, and might even try to find dissidents based on who they are communicating with. What these freedom fighters need, is a way of communication that is secure not only in terms of content, but disguises sender and receiver as well.
+
+We wish to build a chat client that does just that. No silly signed emails or cleverly disguised letter pigeons, but instead a chat client that works just as easily as a normal chatroom.
+
+\section{The How And Why Of P2P}
+
+In the proposed project, we wish to use an unstructured P2P network to send messages between computers, in a way that makes it difficult, if not impossible, to determine sender, receiver and content. Unstructured networks have a great deal of usefulness in this, since they require very little routing information, and often ensure that every member of the network receive a message, without them showing any specific interest in its content.
+
+Also, a peer-to-peer chat application does not allow a single server to be controlled and monitored by outside attackers, and with enough traffic, it will be quite difficult to pinpoint any one user as an interesting target.
+
+\section{Architecture}
+
+We will be using our original network from the P2PN course as the underlying unstructured network, since it already provides us with a suitable structure for sending and receiving messages across between peers.
+
+We will be extending it with new methods to forward messages across the network, without the being searches, and try to implement features from other security-based networks, though we acknowledge that the system itself will be proof-of-concept.
+
+For safe encryption, we will use RSA certificates. How they are distributed will most likely not be part of the network.
+
+\section{Rough Milestones}
+
+\begin{description}
+\item[Week 1-2] Implement simple sending of messages, by flooding, encrypted by RSA.
+\item[Week 2-3] Implement acknowledgements, signing of messages.
+\item[Week 3-4] Implement delivery by k-walkers
+\item[Week 4-6] Try out cover traffic, proof of work, optimized delivery.
+\end{description}
+
+\end{document}
