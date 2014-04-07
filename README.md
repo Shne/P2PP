@@ -5,10 +5,8 @@ https://github.com/telehash/thjs
 
 HOWTO
 --------
+**Installing**  
 install node js from http://nodejs.org/ (not from repos)  
-
-
-**Installing**
 ```
 npm install telehash
 ```
@@ -24,7 +22,10 @@ In root folder:
 ```
 node test-listen.js
 ```
+copy-paste the outputted hashname and insert it into the test-start.js file where there's currently another hashname  
+
 In another terminal:
 ```
 node test-start.js
 ```
+both terminals should now spam you. what you're looking for is the first lines which should be `[ { js: { msg: "FFFF" },` and `[ { js: { msg: "HURRR" },` respectively.
