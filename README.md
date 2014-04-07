@@ -3,8 +3,11 @@ https://github.com/telehash/node-telehash
 https://github.com/telehash/thjs  
 
 
-HOWTO
+HOWTO (Ubuntu)
 --------
+First make sure you don't have gyp installed already from repositories 
+`sudo apt-get purge gyp`
+
 **Installing**  
 install node js from http://nodejs.org/ (not from repos)  
 ```
