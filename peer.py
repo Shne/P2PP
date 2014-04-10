@@ -612,3 +612,24 @@ class Peer:
 				self.testHitRate(k, ttl, samples)
 				print("Messages passed: " + str(self.getAllMessagesPassed()))
 
+	##############
+	# Safety	 #
+	##############
+
+	def sendMessage(self, recipient, message):
+		searchId = self.newSearchId()
+		self.receiveMessage(recipient, message, searchId)
+
+	def receiveMessage(self, recipient, message, searchId):
+		if searchId in self.searches:
+			return None
+		self.searches.add(searchId)
+		if recipient == self.name:
+			print(message)
+		for peer in self.neighbourSet:
+			self.forwardMessage(peer, recipient, message, searchId)
+
+	def forwardMessage(self, peer, recipient, message, searchId):
+		peerProxy = makeProxy(strAddress(peer))
+		forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(recipient, message, searchId))
+		forwardThread.start()
