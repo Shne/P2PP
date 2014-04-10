@@ -21,6 +21,7 @@ from multiprocessing.pool import ThreadPool #keep it secret, keep it safe
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Hash import MD5
 
 
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
@@ -51,6 +52,11 @@ def strMake(name, address, limit):
 def makeProxy(IPPort):
 	url = "http://"+IPPort
 	return xmlrpc.client.ServerProxy(url);
+
+def hash(data):
+	h = MD5.new()
+	h.update(data)
+	return h.digest()
 
 
 
@@ -96,6 +102,7 @@ class Peer:
 
 		self.friends = dict()
 		self.cipher = None
+		self.messagesSet = set([])
 
 	#######################
 	# Simple peer listing #
@@ -636,22 +643,22 @@ class Peer:
 
 	#Send a message to a friend, not that you need to set up his public key first, fully async.
 	def sendMessage(self, recipient, message):
-		searchId = self.newSearchId()
 		encryptedMessage = self.friends[recipient].encrypt(message.encode('utf-8'))
-		self.receiveMessage(recipient, encryptedMessage, searchId)
+		self.receiveMessage(recipient, xmlrpc.client.Binary(encryptedMessage))
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
-	def receiveMessage(self, recipient, message, searchId): #Note: message is an XMLRPC binary data wrapper
-		if searchId in self.searches:
+	def receiveMessage(self, recipient, message): #Note: message is an XMLRPC binary data wrapper
+		mhash = hash(message.data)
+		if mhash in self.messagesSet:
 			return None
-		self.searches.add(searchId)
+		self.messagesSet.add(mhash)
 		if recipient == self.name:
 			print(self.cipher.decrypt(message.data).decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
 		for peer in self.neighbourSet:
-			self.forwardMessage(peer, recipient, message, searchId)
+			self.forwardMessage(peer, recipient, message)
 
 	#Helper to forward a message
-	def forwardMessage(self, peer, recipient, message, searchId):
+	def forwardMessage(self, peer, recipient, message):
 		peerProxy = makeProxy(strAddress(peer))
-		forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(recipient, message, searchId))
+		forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(recipient, message))
 		forwardThread.start()
