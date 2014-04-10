@@ -625,7 +625,7 @@ class Peer:
 	def addFriend(self, name, key):
 		publickey = RSA.importKey(open(key, 'r+b').read())
 		cipher = PKCS1_OAEP.new(publickey)
-		self.friends[name] = key
+		self.friends[name] = cipher
 
 	def setSecret(self, key):
 		private = RSA.importKey(open('private.pem', 'r+b').read())
@@ -634,14 +634,15 @@ class Peer:
 
 	def sendMessage(self, recipient, message):
 		searchId = self.newSearchId()
-		self.receiveMessage(recipient, message.encode('utf-8'), searchId)
+		encryptedMessage = self.friends[recipient].encrypt(message.encode('utf-8'))
+		self.receiveMessage(recipient, encryptedMessage, searchId)
 
 	def receiveMessage(self, recipient, message, searchId):
 		if searchId in self.searches:
 			return None
 		self.searches.add(searchId)
 		if recipient == self.name:
-			print(message.data.decode('utf-8'))
+			print(self.cipher.decrypt(message.data).decode('utf-8'))
 		for peer in self.neighbourSet:
 			self.forwardMessage(peer, recipient, message, searchId)
 
