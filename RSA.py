@@ -1,5 +1,6 @@
 from Crypto.PublicKey import RSA
 
+#Generate glorious key
 key = RSA.generate(2048)
 
 f = open('private.pem','w+b')

@@ -1,6 +1,7 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 
+#Generate keys with RSA.py
 private = RSA.importKey(open('private.pem', 'r+b').read())
 public = RSA.importKey(open('public.pem', 'r+b').read())
 
