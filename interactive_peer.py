@@ -223,5 +223,15 @@ while True:
 		thisPeer.sendMessage(match.group(1), match.group(2))
 		continue
 
+	match = re.match(r"friend ([a-zA-Z0-9]+) (.+)$", do)
+	if match:
+		thisPeer.addFriend(match.group(1), match.group(2))
+		continue
+
+	match = re.match(r"secret (.+)$", do)
+	if match:
+		thisPeer.setSecret(match.group(1))
+		continue
+
 	# DEFAULT
 	print('Command not recognized')

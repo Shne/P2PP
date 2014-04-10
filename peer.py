@@ -19,6 +19,9 @@ from socketserver import ThreadingMixIn
 
 from multiprocessing.pool import ThreadPool #keep it secret, keep it safe
 
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+
 
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
     pass
@@ -90,6 +93,9 @@ class Peer:
 		# print(self.peerSet)
 
 		self.pool = ThreadPool(processes = int(self.peerLimit))
+
+		self.friends = dict()
+		self.cipher = None
 
 	#######################
 	# Simple peer listing #
@@ -616,16 +622,26 @@ class Peer:
 	# Safety	 #
 	##############
 
+	def addFriend(self, name, key):
+		publickey = RSA.importKey(open(key, 'r+b').read())
+		cipher = PKCS1_OAEP.new(publickey)
+		self.friends[name] = key
+
+	def setSecret(self, key):
+		private = RSA.importKey(open('private.pem', 'r+b').read())
+		cipher = PKCS1_OAEP.new(private)
+		self.cipher = cipher
+
 	def sendMessage(self, recipient, message):
 		searchId = self.newSearchId()
-		self.receiveMessage(recipient, message, searchId)
+		self.receiveMessage(recipient, message.encode('utf-8'), searchId)
 
 	def receiveMessage(self, recipient, message, searchId):
 		if searchId in self.searches:
 			return None
 		self.searches.add(searchId)
 		if recipient == self.name:
-			print(message)
+			print(message.data.decode('utf-8'))
 		for peer in self.neighbourSet:
 			self.forwardMessage(peer, recipient, message, searchId)
 
