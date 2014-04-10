@@ -622,30 +622,35 @@ class Peer:
 	# Safety	 #
 	##############
 
+	#Add a friend with a simple name, and assign him the given public key
 	def addFriend(self, name, key):
 		publickey = RSA.importKey(open(key, 'r+b').read())
-		cipher = PKCS1_OAEP.new(publickey)
+		cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
 		self.friends[name] = cipher
 
+	#Set up your own private key
 	def setSecret(self, key):
 		private = RSA.importKey(open('private.pem', 'r+b').read())
 		cipher = PKCS1_OAEP.new(private)
 		self.cipher = cipher
 
+	#Send a message to a friend, not that you need to set up his public key first, fully async.
 	def sendMessage(self, recipient, message):
 		searchId = self.newSearchId()
 		encryptedMessage = self.friends[recipient].encrypt(message.encode('utf-8'))
 		self.receiveMessage(recipient, encryptedMessage, searchId)
 
-	def receiveMessage(self, recipient, message, searchId):
+	#Recieve message, check if it's for us, try to decode it and pass it on
+	def receiveMessage(self, recipient, message, searchId): #Note: message is an XMLRPC binary data wrapper
 		if searchId in self.searches:
 			return None
 		self.searches.add(searchId)
 		if recipient == self.name:
-			print(self.cipher.decrypt(message.data).decode('utf-8'))
+			print(self.cipher.decrypt(message.data).decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
 		for peer in self.neighbourSet:
 			self.forwardMessage(peer, recipient, message, searchId)
 
+	#Helper to forward a message
 	def forwardMessage(self, peer, recipient, message, searchId):
 		peerProxy = makeProxy(strAddress(peer))
 		forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(recipient, message, searchId))
