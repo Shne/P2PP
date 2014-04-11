@@ -637,28 +637,31 @@ class Peer:
 
 	#Set up your own private key
 	def setSecret(self, key):
-		private = RSA.importKey(open('private.pem', 'r+b').read())
+		private = RSA.importKey(open(key, 'r+b').read()) #Oh shit, this read 'private.pem', I was scared there
 		cipher = PKCS1_OAEP.new(private)
 		self.cipher = cipher
 
 	#Send a message to a friend, not that you need to set up his public key first, fully async.
 	def sendMessage(self, recipient, message):
 		encryptedMessage = self.friends[recipient].encrypt(message.encode('utf-8'))
-		self.receiveMessage(recipient, xmlrpc.client.Binary(encryptedMessage))
+		self.receiveMessage(xmlrpc.client.Binary(encryptedMessage))
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
-	def receiveMessage(self, recipient, message): #Note: message is an XMLRPC binary data wrapper
+	def receiveMessage(self, message): #Note: message is an XMLRPC binary data wrapper
 		mhash = hash(message.data)
 		if mhash in self.messagesSet:
 			return None
 		self.messagesSet.add(mhash)
-		if recipient == self.name:
-			print(self.cipher.decrypt(message.data).decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+		if self.cipher != None: # No reason to try to snoop without a secret
+			try: #Only recipient can decode data
+				print(self.cipher.decrypt(message.data).decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+			except ValueError:
+				pass #We end up here when trying to decrypt with a non-matching key
 		for peer in self.neighbourSet:
-			self.forwardMessage(peer, recipient, message)
+			self.forwardMessage(peer, message)
 
 	#Helper to forward a message
-	def forwardMessage(self, peer, recipient, message):
+	def forwardMessage(self, peer, message):
 		peerProxy = makeProxy(strAddress(peer))
-		forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(recipient, message))
+		forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(message,)) #The comma, I have no idea
 		forwardThread.start()
