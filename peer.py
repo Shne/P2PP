@@ -25,7 +25,15 @@ from Crypto.Hash import MD5
 
 
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
-    pass
+	def _dispatch(self, method, params):
+		func = None
+		try:
+			func =  getattr(self.instance, method).RPC #Only allow methods tagged as RPC methods to be called from RPC
+		except (KeyError, AttributeError) as err:
+			print("Forbidden: " + method )
+			return None
+		return super(RPCThreading, self)._dispatch(method, params)
+		
 
 	###########
 	# Helpers #
@@ -58,6 +66,10 @@ def hash(data):
 	h.update(data)
 	return h.digest()
 
+#Fuctions tagged as @RPC will get the correct attribute
+def RPC(func):
+	func.RPC = True
+	return func
 
 
 class Peer:
@@ -108,15 +120,18 @@ class Peer:
 	# Simple peer listing #
 	#######################
 
+	@RPC
 	def listPeers(self):
 		return self.peerSet
 
+	@RPC
 	def hello(self, name, address, limit):
 		contactStr = strMake(name, address, limit)
 		with self.peerSetLock:
 			self.peerSet.update([contactStr])
 			# print(contactStr+' said hello. ' + self.name + ': updated peerSet: '+str(self.peerSet))
 		return list(self.peerSet) #Not totally threadsafe, but safe enough
+
 
 	def sayHello(self,IPPort):
 		try:
@@ -210,6 +225,7 @@ class Peer:
 	##############
 	# Neighbours #
 	##############
+	@RPC
 	def getNeighbours(self, plist):
 		remList = [peer for peer in self.peerSet if strName(peer) in plist] #WOW
 		#neighbourDict = {strName(x) + "(" + strLimit(x) + ")"  : makeProxy(strAddress(x)).listNeighbours() for x in remList} #OH SNAP
@@ -223,12 +239,15 @@ class Peer:
 				neighbourDict[pname] = []
 		return neighbourDict
 
+	@RPC
 	def listNeighbours(self):
 		return [strName(peer) + "(" + strLimit(peer) + ")" for peer in self.neighbourSet]
 
+	@RPC
 	def getNeighbourDegree(self):
 		return len(self.neighbourSet)
 
+	@RPC
 	def getAllNeighbours(self):
 		return self.getNeighbours([strName(peer) for peer in self.peerSet])
 
@@ -264,6 +283,8 @@ class Peer:
 
 
 	#Based on pseudo-code from Week2 slides about GIA.
+
+	@RPC
 	def requestAddNeighbour(self, name, address, limit):
 		Y = strMake(name, address, limit)
 		if(self.neighbourSemaphore.acquire(False)):
@@ -334,6 +355,7 @@ class Peer:
 		else:
 			return False
 
+	@RPC
 	def removeNeighbour(self, neighbour):
 		if neighbour in self.neighbourSet:
 			with self.neighbourSetLock:
@@ -345,6 +367,8 @@ class Peer:
 		if not self.neighbourThread.isAlive():
 			self.neighbourThread.start()			
 	
+		
+	@RPC
 	def ping(self):
 		return True
 
@@ -387,6 +411,8 @@ class Peer:
 	# Flood Search #
 	################
 
+		
+	@RPC
 	def floodSearch(self, key, searchId, TTL):
 		#print(self.name + " received search for " + key + " with id " + searchId + " --- Previously seen searchIds: " + str(self.searches))
 		if key in self.resources.keys():
@@ -435,6 +461,8 @@ class Peer:
 	def addResource(self, key, value):
 		self.resources[key] = value
 
+		
+	@RPC
 	def getResource(self, key):
 		return self.resources[key]
 
@@ -455,7 +483,8 @@ class Peer:
 		searchId = self.newSearchId()
 		self.handleWalkers(key, k, searchId, TTL, self.myString, self.myString)
 
-
+		
+	@RPC
 	def handleWalkers(self, key, k, searchId, TTL, originalSourcePeer, sourcePeer):
 		#has the original source peer already found a result?
 		if TTL % 4 is 0: # only check each 4th step
@@ -525,10 +554,12 @@ class Peer:
 		walkerThread = threading.Thread(target=peerProxy.handleWalkers, args=(key, k, searchId, TTL, originalSourcePeer, sourcePeer))
 		walkerThread.start()
 		
+	@RPC
 	def walkerResultFound(self, key, peer):
 		self.resourceMap[key] = peer
 		# print('result found at peer: '+peer)
-			
+		
+	@RPC
 	def hasKeyBeenFound(self, key):
 		return key in self.resourceMap
 
@@ -537,34 +568,43 @@ class Peer:
 	# STATISTICS #
 	##############
 
+	@RPC
 	def getMessagesPassed(self):
 		return self.messagesPassed
 
+	@RPC
 	def getAllMessagesPassed(self):
 		return sum([makeProxy(strAddress(p)).getMessagesPassed() for p in self.peerSet])
 
+	@RPC
 	def getMessagesPerPeer(self):
 		return {strName(peer) +"(" +  strLimit(peer) + ")" : makeProxy(strAddress(peer)).getMessagesPassed() for peer in self.peerSet}
 
+	@RPC
 	def resetMessagesCounter(self):
 		self.messagesPassed = 0
 
+	@RPC
 	def resetAllMessagesCounter(self):
 		for p in self.peerSet:
 			makeProxy(strAddress(p)).resetMessagesCounter()
 
+	@RPC
 	def resetResourceMap(self):
 		self.resourceMap = dict()
 
+	@RPC
 	def resetAllResourceMaps(self):
 		for p in self.peerSet:
 			makeProxy(strAddress(p)).resetResourceMap()
 
+	@RPC
 	def fullReset(self):
 		self.resetMessagesCounter()
 		self.resetResourceMap()
 		self.searches = set([])
 
+	@RPC
 	def fullResetAll(self):
 		for p in self.peerSet:
 			makeProxy(strAddress(p)).fullReset()
@@ -647,6 +687,7 @@ class Peer:
 		self.receiveMessage(xmlrpc.client.Binary(encryptedMessage))
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
+	@RPC
 	def receiveMessage(self, message): #Note: message is an XMLRPC binary data wrapper
 		mhash = hash(message.data)
 		if mhash in self.messagesSet:
