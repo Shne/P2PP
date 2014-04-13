@@ -3,3 +3,5 @@
 Error handling -> missing friends, missing secret, dead peer, uzw.
 ~~Tag certain calls to be non-accessible to RPC (key handling)  #I did the reverse~~ 
 Start on Milestone 2
+~~basic ack and signature/verification~~
+improvement: use nonce when encrypting message, so same message can be sent more than once and better security

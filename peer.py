@@ -21,7 +21,8 @@ from multiprocessing.pool import ThreadPool #keep it secret, keep it safe
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
-from Crypto.Hash import MD5
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.Hash import SHA256
 
 
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
@@ -62,7 +63,7 @@ def makeProxy(IPPort):
 	return xmlrpc.client.ServerProxy(url);
 
 def hash(data):
-	h = MD5.new()
+	h = SHA256.new()
 	h.update(data)
 	return h.digest()
 
@@ -673,18 +674,26 @@ class Peer:
 	def addFriend(self, name, key):
 		publickey = RSA.importKey(open(key, 'r+b').read())
 		cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
-		self.friends[name] = cipher
+		signer = PKCS1_v1_5.new(publickey)
+		self.friends[name] = (cipher, signer)
 
 	#Set up your own private key
 	def setSecret(self, key):
-		private = RSA.importKey(open(key, 'r+b').read()) #Oh shit, this read 'private.pem', I was scared there
-		cipher = PKCS1_OAEP.new(private)
-		self.cipher = cipher
+		privateKey = RSA.importKey(open(key, 'r+b').read()) #Oh shit, this read 'private.pem', I was scared there
+		self.cipher = PKCS1_OAEP.new(privateKey)
+		self.signer = PKCS1_v1_5.new(privateKey)
 
 	#Send a message to a friend, not that you need to set up his public key first, fully async.
 	def sendMessage(self, recipient, message):
-		encryptedMessage = self.friends[recipient].encrypt(message.encode('utf-8'))
-		self.receiveMessage(xmlrpc.client.Binary(encryptedMessage))
+		(cipher, signer) = self.friends[recipient]
+		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
+		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
+		signature = self.receiveMessage(wrappedEncryptedMessage).data
+
+		digest = SHA256.new()
+		digest.update(message.encode('utf-8'))
+		if signer.verify(digest, signature):
+			print(recipient+' received message! (verified)')
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
 	@RPC
@@ -695,14 +704,29 @@ class Peer:
 		self.messagesSet.add(mhash)
 		if self.cipher != None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
-				print(self.cipher.decrypt(message.data).decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+				decryptedMessage = self.cipher.decrypt(message.data)
+				print('Received Message: '+decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+
+				digest = SHA256.new()
+				digest.update(decryptedMessage)
+				signature = self.signer.sign(digest)
+				return signature
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
-		for peer in self.neighbourSet:
-			self.forwardMessage(peer, message)
+
+		neighbourResults = self.pool.map(self.forwardMessage, [(peer, message) for peer in self.neighbourSet])
+		for result in neighbourResults:
+			if result is not None:
+				return result
+		return None
+		# for peer in self.neighbourSet:
+		# 	self.forwardMessage(peer, message)
 
 	#Helper to forward a message
-	def forwardMessage(self, peer, message):
+	def forwardMessage(self, args):
+		(peer, message) = args
 		peerProxy = makeProxy(strAddress(peer))
-		forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(message,)) #The comma, I have no idea
-		forwardThread.start()
+		return peerProxy.receiveMessage(message)
+		# forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(message,)) #The comma, I have no idea
+		# forwardThread.start()
+		
