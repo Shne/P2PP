@@ -672,20 +672,29 @@ class Peer:
 
 	#Add a friend with a simple name, and assign him the given public key
 	def addFriend(self, name, key):
-		publickey = RSA.importKey(open(key, 'r+b').read())
-		cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
-		signer = PKCS1_v1_5.new(publickey)
-		self.friends[name] = (cipher, signer)
+		try:
+			publickey = RSA.importKey(open(key, 'r+b').read())
+			cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
+			signer = PKCS1_v1_5.new(publickey)
+			self.friends[name] = (cipher, signer)
+		except FileNotFoundError:
+			print("Error, public key not found")
 
 	#Set up your own private key
 	def setSecret(self, key):
-		privateKey = RSA.importKey(open(key, 'r+b').read()) #Oh shit, this read 'private.pem', I was scared there
-		self.cipher = PKCS1_OAEP.new(privateKey)
-		self.signer = PKCS1_v1_5.new(privateKey)
-
+		try:
+			privateKey = RSA.importKey(open(key, 'r+b').read()) #Oh shit, this read 'private.pem', I was scared there
+			self.cipher = PKCS1_OAEP.new(privateKey)
+			self.signer = PKCS1_v1_5.new(privateKey)
+		except FileNotFoundError:
+			print("Error, private key not found")
 	#Send a message to a friend, not that you need to set up his public key first, fully async.
 	def sendMessage(self, recipient, message):
-		(cipher, signer) = self.friends[recipient]
+		try:
+			(cipher, signer) = self.friends[recipient]
+		except KeyError:
+			print("Error, unknown friend")
+			return None
 		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
 		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
 		signature = self.receiveMessage(wrappedEncryptedMessage).data
@@ -725,8 +734,12 @@ class Peer:
 	#Helper to forward a message
 	def forwardMessage(self, args):
 		(peer, message) = args
-		peerProxy = makeProxy(strAddress(peer))
-		return peerProxy.receiveMessage(message)
+		try:
+			peerProxy = makeProxy(strAddress(peer))
+			return peerProxy.receiveMessage(message)
+		except ConnectionError as err:
+			self.evictPeers([peer])
+			return None
 		# forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(message,)) #The comma, I have no idea
 		# forwardThread.start()
 		
