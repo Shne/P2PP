@@ -16,11 +16,13 @@ improvement: What if multiple members return signature? Eg. malicious client. Mi
 
 ~~Allow senders to sign message (take as parameter, check against friends)~~
 
-Improvement: Resend until ack is returned 
+Improvement: Resend until ack is returned (Use higher and higher ttl/k/sleep time)
 
-Improvement: If we send the same message from 2 source to the same peer, the ack is valid for both, use a Nonce
+Improvement: If we send the same message from 2 sources to the same peer, the ack is valid for both, use a Nonce
 
 Improvement: Work out something better for k/ttl for k-walker delivery
+
+Error-proof k-walker/ack connection errors (See flooding version for guidance)
 
 Prettify Kris's code
 
