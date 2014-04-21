@@ -14,6 +14,6 @@ improvement: What if multiple members return signature? Eg. malicious client. Mi
 
 Allow senders to sign message, take as parameter , check against friends
 
-k-walker, send message to network, don't wait for return value, send ack back in same way
+k-walker, send message to network, don't wait for return value, send ack back in same way #Kris Dibz
 
 Improvement: Resend until ack is returned 
