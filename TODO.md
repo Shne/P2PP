@@ -8,12 +8,20 @@
 
 ~~basic ack and signature/verification~~
 
-improvement: use nonce when encrypting message, so same message can be sent more than once and better security #Doesn't the encrypter thing dothis?
+~~k-walker, send message to network, don't wait for return value, send ack back in same way #Kris Dibz~~
 
-improvement: What if multiple members return signature? Eg. malicious client. Might be an idea to get a list, and check everyone #see k-walker
+improvement: use nonce when encrypting message, so same message can be sent more than once and better security #Doesn't the encrypter thing do this?
 
-Allow senders to sign message, take as parameter , check against friends
+improvement: What if multiple members return signature? Eg. malicious client. Might be an idea to get a list, and check everyone #See k-walker
 
-k-walker, send message to network, don't wait for return value, send ack back in same way #Kris Dibz
+~~Allow senders to sign message (take as parameter, check against friends)~~
 
 Improvement: Resend until ack is returned 
+
+Improvement: If we send the same message from 2 source to the same peer, the ack is valid for both, use a Nonce
+
+Improvement: Work out something better for k/ttl for k-walker delivery
+
+Prettify Kris's code
+
+Code review

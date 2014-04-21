@@ -830,13 +830,11 @@ class Peer:
 		digest.update(decryptedMessage)
 		sender = "???"
 		if signature == None:
-			print("NONE")
 			return sender
 		for k, v in self.friends.items():
 			(cipher, signer) = v
 			if signer.verify(digest, signature.data):
 				sender = k
-				print("YES: " + k)
 			else:
-				print("NO: " + k)
+				pass
 		return sender
