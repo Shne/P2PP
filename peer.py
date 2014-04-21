@@ -15,6 +15,8 @@ import random
 import time
 import math
 
+import traceback
+
 from socketserver import ThreadingMixIn
 
 from multiprocessing.pool import ThreadPool #keep it secret, keep it safe
@@ -33,7 +35,11 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 		except (KeyError, AttributeError) as err:
 			print("Forbidden: " + method )
 			return None
-		return super(RPCThreading, self)._dispatch(method, params)
+		try:
+			return super(RPCThreading, self)._dispatch(method, params)
+		except:
+			traceback.print_exc()
+			raise
 		
 
 	###########
@@ -116,6 +122,7 @@ class Peer:
 		self.friends = dict()
 		self.cipher = None
 		self.messagesSet = set([])
+		self.awaitingAcks = dict()
 
 	#######################
 	# Simple peer listing #
@@ -688,6 +695,7 @@ class Peer:
 			self.signer = PKCS1_v1_5.new(privateKey)
 		except FileNotFoundError:
 			print("Error, private key not found")
+
 	#Send a message to a friend, not that you need to set up his public key first, fully async.
 	def sendMessage(self, recipient, message):
 		try:
@@ -695,18 +703,29 @@ class Peer:
 		except KeyError:
 			print("Error, unknown friend")
 			return None
+
+		owndigest = SHA256.new()
+		owndigest.update(message.encode('utf-8'))
+		sig = None
+		try:
+			sig = self.signer.sign(owndigest)
+		except AttributeError:
+			print("Note: You are sending signature-free messages")
+
 		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
 		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
-		signature = self.receiveMessage(wrappedEncryptedMessage).data
-
+		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig))
+		if signature == None:
+			print("Message not received!")
+			return
 		digest = SHA256.new()
 		digest.update(message.encode('utf-8'))
-		if signer.verify(digest, signature):
+		if signer.verify(digest, signature.data):
 			print(recipient+' received message! (verified)')
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
 	@RPC
-	def receiveMessage(self, message): #Note: message is an XMLRPC binary data wrapper
+	def receiveMessage(self, message, sig): #Note: message is an XMLRPC binary data wrapper
 		mhash = hash(message.data)
 		if mhash in self.messagesSet:
 			return None
@@ -714,7 +733,7 @@ class Peer:
 		if self.cipher != None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
-				print('Received Message: '+decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+				print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
 
 				digest = SHA256.new()
 				digest.update(decryptedMessage)
@@ -723,7 +742,7 @@ class Peer:
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 
-		neighbourResults = self.pool.map(self.forwardMessage, [(peer, message) for peer in self.neighbourSet])
+		neighbourResults = self.pool.map(self.forwardMessage, [(peer, message, sig) for peer in self.neighbourSet])
 		for result in neighbourResults:
 			if result is not None:
 				return result
@@ -733,13 +752,91 @@ class Peer:
 
 	#Helper to forward a message
 	def forwardMessage(self, args):
-		(peer, message) = args
+		(peer, message, sig) = args
 		try:
 			peerProxy = makeProxy(strAddress(peer))
-			return peerProxy.receiveMessage(message)
+			return peerProxy.receiveMessage(message, sig)
 		except ConnectionError as err:
 			self.evictPeers([peer])
 			return None
 		# forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(message,)) #The comma, I have no idea
 		# forwardThread.start()
-		
+
+	def kSendMessage(self, recipient, message, k, ttl):
+		messageID = self.newSearchId()
+		try:
+			(cipher, signer) = self.friends[recipient]
+		except KeyError:
+			print("Error, unknown friend")
+			return None
+		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
+		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
+
+		owndigest = SHA256.new()
+		owndigest.update(message.encode('utf-8'))
+		signature = None
+		try:
+			signature = self.signer.sign(owndigest)
+		except AttributeError:
+			print("Note: You are sending signature-free messages")
+		digest = SHA256.new()
+		digest.update(message.encode('utf-8'))
+		self.awaitingAcks[messageID] = (digest, signer)
+		print("Sending message:" + messageID)
+		for i in range(k):
+			self.kReceiveMessage(wrappedEncryptedMessage, ttl,  xmlrpc.client.Binary(signature))
+
+	@RPC
+	def kReceiveMessage(self, message, ttl, sig): #Note: message is an XMLRPC binary data wrapper
+		mhash = hash(message.data)
+		if ttl < 0:
+			return None
+		if self.cipher != None: # No reason to try to snoop without a secret
+			try: #Only recipient can decode data
+				decryptedMessage = self.cipher.decrypt(message.data)
+				if not (mhash in self.messagesSet): #We might end up here a lot
+					self.messagesSet.add(mhash)
+					print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+				digest = SHA256.new()
+				digest.update(decryptedMessage)
+				signature = self.signer.sign(digest)
+				self.kAck(xmlrpc.client.Binary(signature), 10) #TODO:do something smarter about k/ttl
+			except ValueError:
+				pass #We end up here when trying to decrypt with a non-matching key
+		peerProxy = makeProxy(strAddress(random.sample(self.neighbourSet, 1)[0]))
+		forwardThread = threading.Thread(target=peerProxy.kReceiveMessage, args=(message, ttl-1, sig))
+		forwardThread.start()
+
+	@RPC
+	def kAck(self, ack, ttl):
+		if ttl < 0: #It's dead mang!
+			return None
+		ackID = None
+		if not (ack.data in self.messagesSet): #Make sure we haven't checked the ack before
+			for k, v in self.awaitingAcks.items(): #Check for each ack we're missing
+				(digest, signer) = v
+				if signer.verify(digest, ack.data):
+					ackID = k #The ack is good!
+		if ackID != None:
+			print("Message delivered and acknowledged: " + ackID)
+			del self.awaitingAcks[ackID] #No need to keep this around
+		self.messagesSet.add(ack.data)
+		peerProxy = makeProxy(strAddress(random.sample(self.neighbourSet, 1)[0]))
+		forwardThread = threading.Thread(target=peerProxy.kAck, args=(ack, ttl-1))
+		forwardThread.start() #To infinity, and beyond!
+
+	def checkSender(self, decryptedMessage, signature):
+		digest = SHA256.new()
+		digest.update(decryptedMessage)
+		sender = "???"
+		if signature == None:
+			print("NONE")
+			return sender
+		for k, v in self.friends.items():
+			(cipher, signer) = v
+			if signer.verify(digest, signature.data):
+				sender = k
+				print("YES: " + k)
+			else:
+				print("NO: " + k)
+		return sender

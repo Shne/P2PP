@@ -223,6 +223,11 @@ while True:
 		thisPeer.sendMessage(match.group(1), match.group(2))
 		continue
 
+	match = re.match(r"kmessage ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$", do)
+	if match:
+		thisPeer.kSendMessage(match.group(1), match.group(2), 1, 10)
+		continue
+
 	match = re.match(r"friend ([a-zA-Z0-9]+) (.+)$", do)
 	if match:
 		thisPeer.addFriend(match.group(1), match.group(2))
