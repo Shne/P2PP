@@ -122,6 +122,7 @@ class Peer:
 		self.friends = dict()
 		self.cipher = None
 		self.messagesSet = set([])
+		self.acksSet = set([])
 		self.awaitingAcks = dict()
 
 	#######################
@@ -796,7 +797,7 @@ class Peer:
 				digest = SHA256.new()
 				digest.update(decryptedMessage)
 				signature = self.signer.sign(digest)
-				self.kAck(xmlrpc.client.Binary(signature), 10) #TODO:do something smarter about k/ttl
+				self.kAck(xmlrpc.client.Binary(signature), 32) #TODO:do something smarter about k/ttl
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 		peerProxy = makeProxy(strAddress(random.sample(self.neighbourSet, 1)[0]))
@@ -807,16 +808,15 @@ class Peer:
 	def kAck(self, ack, ttl):
 		if ttl < 0: #It's dead mang!
 			return None
-		ackID = None
-		if not (ack.data in self.messagesSet): #Make sure we haven't checked the ack before
+		if not (ack.data in self.acksSet): #Make sure we haven't checked the ack before
 			for k, v in self.awaitingAcks.items(): #Check for each ack we're missing
 				(digest, signer) = v
 				if signer.verify(digest, ack.data):
-					ackID = k #The ack is good!
-		if ackID is not None:
-			print("Message delivered and acknowledged: " + ackID)
-			del self.awaitingAcks[ackID] #No need to keep this around
-		self.messagesSet.add(ack.data)
+					print("Message delivered and acknowledged: " + k)
+					del self.awaitingAcks[k] #No need to keep this around
+					break
+		self.acksSet.add(ack.data) #remember we've checked this ack
+
 		peerProxy = makeProxy(strAddress(random.sample(self.neighbourSet, 1)[0]))
 		forwardThread = threading.Thread(target=peerProxy.kAck, args=(ack, ttl-1))
 		forwardThread.start() #To infinity, and beyond!
