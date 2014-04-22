@@ -73,6 +73,14 @@ def hash(data):
 	h.update(data)
 	return h.digest()
 
+def nonceMsg(msg):
+	nonce = random.random()
+	noncedMsg = msg + str(nonce)
+	return (noncedMsg, nonce)
+
+def unnonceMsg(noncedMsg, nonce):
+	return noncedMsg[:0-len(str(nonce))]
+
 #Fuctions tagged as @RPC will get the correct attribute
 def RPC(func):
 	func.RPC = True
@@ -768,11 +776,13 @@ class Peer:
 		except KeyError:
 			print("Error, unknown friend")
 			return None
-		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
+
+		(noncedMessage, nonce) = nonceMsg(message)
+		encryptedMessage = cipher.encrypt(noncedMessage.encode('utf-8'))
 		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
 
 		owndigest = SHA256.new()
-		owndigest.update(message.encode('utf-8'))
+		owndigest.update(noncedMessage.encode('utf-8'))
 		signature = None
 		try:
 			signature = self.signer.sign(owndigest)
@@ -781,10 +791,10 @@ class Peer:
 		self.awaitingAcks[messageID] = (owndigest, signer)
 		print("Sending message:" + messageID)
 		for i in range(k):
-			self.kReceiveMessage(wrappedEncryptedMessage, ttl,  xmlrpc.client.Binary(signature))
+			self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature))
 
 	@RPC
-	def kReceiveMessage(self, message, ttl, sig): #Note: message is an XMLRPC binary data wrapper
+	def kReceiveMessage(self, message, nonce, ttl, sig): #Note: message is an XMLRPC binary data wrapper
 		mhash = hash(message.data)
 		if ttl < 0:
 			return None
@@ -793,7 +803,8 @@ class Peer:
 				decryptedMessage = self.cipher.decrypt(message.data)
 				if not (mhash in self.messagesSet): #We might end up here a lot
 					self.messagesSet.add(mhash)
-					print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+					unnoncedMessage = unnonceMsg(decryptedMessage, nonce)
+					print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  unnoncedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
 				digest = SHA256.new()
 				digest.update(decryptedMessage)
 				signature = self.signer.sign(digest)
@@ -801,7 +812,7 @@ class Peer:
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 		peerProxy = makeProxy(strAddress(random.sample(self.neighbourSet, 1)[0]))
-		forwardThread = threading.Thread(target=peerProxy.kReceiveMessage, args=(message, ttl-1, sig))
+		forwardThread = threading.Thread(target=peerProxy.kReceiveMessage, args=(message, nonce, ttl-1, sig))
 		forwardThread.start()
 
 	@RPC

@@ -10,7 +10,7 @@
 
 ~~k-walker, send message to network, don't wait for return value, send ack back in same way #Kris Dibz~~
 
-improvement: use nonce when encrypting message, so same message can be sent more than once and better security #Doesn't the encrypter thing do this?
+~~improvement: use nonce when encrypting message, so same message can be sent more than once and better security #Doesn't the encrypter thing do this?~~
 
 improvement: What if multiple members return signature? Eg. malicious client. Might be an idea to get a list, and check everyone #See k-walker
 
@@ -18,7 +18,7 @@ improvement: What if multiple members return signature? Eg. malicious client. Mi
 
 Improvement: Resend until ack is returned (Use higher and higher ttl/k/sleep time)
 
-Improvement: If we send the same message from 2 sources to the same peer, the ack is valid for both, use a Nonce
+~~Improvement: If we send the same message from 2 sources to the same peer, the ack is valid for both, use a Nonce #messages are nonced now~~
 
 Improvement: Work out something better for k/ttl for k-walker delivery
 
