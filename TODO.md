@@ -12,7 +12,7 @@
 
 ~~improvement: use nonce when encrypting message, so same message can be sent more than once and better security #Doesn't the encrypter thing do this?~~
 
-improvement: What if multiple members return signature? Eg. malicious client. Might be an idea to get a list, and check everyone #See k-walker
+improvement: What if multiple members return signature? Eg. malicious client. Might be an idea to get a list, and check everyone #See k-walker #jhk: so is it done?
 
 ~~Allow senders to sign message (take as parameter, check against friends)~~
 
@@ -20,10 +20,8 @@ Improvement: Resend until ack is returned (Use higher and higher ttl/k/sleep tim
 
 ~~Improvement: If we send the same message from 2 sources to the same peer, the ack is valid for both, use a Nonce #messages are nonced now~~
 
-Improvement: Work out something better for k/ttl for k-walker delivery
+Improvement: Work out something better for k/ttl for k-walker delivery #jhk: what is 'better'?
 
 Error-proof k-walker/ack connection errors (See flooding version for guidance)
 
-Prettify Kris's code
-
-Code review
+encrypt all xml-rpc traffic. use Diffie-Hellman to exchange secret

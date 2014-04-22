@@ -795,12 +795,12 @@ class Peer:
 
 	@RPC
 	def kReceiveMessage(self, message, nonce, ttl, sig): #Note: message is an XMLRPC binary data wrapper
-		mhash = hash(message.data)
 		if ttl < 0:
 			return None
 		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
+				mhash = hash(message.data)
 				if not (mhash in self.messagesSet): #We might end up here a lot
 					self.messagesSet.add(mhash)
 					unnoncedMessage = unnonceMsg(decryptedMessage, nonce)
