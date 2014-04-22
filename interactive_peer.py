@@ -47,7 +47,7 @@ thisPeer = Peer(args.name, args.IP, args.port, args.limit)
 thisPeer.addResource(args.name, args.name + ' is interactive peer')
 
 while True:
-	do = input()
+	do = input('>')
 
 	# PEERS
 	match = re.match("plist", do)
