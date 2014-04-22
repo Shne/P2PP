@@ -718,9 +718,7 @@ class Peer:
 		if signature == None:
 			print("Message not received!")
 			return
-		digest = SHA256.new()
-		digest.update(message.encode('utf-8'))
-		if signer.verify(digest, signature.data):
+		if signer.verify(owndigest, signature.data):
 			print(recipient+' received message! (verified)')
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
@@ -779,9 +777,7 @@ class Peer:
 			signature = self.signer.sign(owndigest)
 		except AttributeError:
 			print("Note: You are sending signature-free messages")
-		digest = SHA256.new()
-		digest.update(message.encode('utf-8'))
-		self.awaitingAcks[messageID] = (digest, signer)
+		self.awaitingAcks[messageID] = (owndigest, signer)
 		print("Sending message:" + messageID)
 		for i in range(k):
 			self.kReceiveMessage(wrappedEncryptedMessage, ttl,  xmlrpc.client.Binary(signature))
