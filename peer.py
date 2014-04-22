@@ -715,7 +715,7 @@ class Peer:
 		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
 		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
 		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig))
-		if signature == None:
+		if signature is None:
 			print("Message not received!")
 			return
 		if signer.verify(owndigest, signature.data):
@@ -728,7 +728,7 @@ class Peer:
 		if mhash in self.messagesSet:
 			return None
 		self.messagesSet.add(mhash)
-		if self.cipher != None: # No reason to try to snoop without a secret
+		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
 				print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
@@ -787,7 +787,7 @@ class Peer:
 		mhash = hash(message.data)
 		if ttl < 0:
 			return None
-		if self.cipher != None: # No reason to try to snoop without a secret
+		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
 				if not (mhash in self.messagesSet): #We might end up here a lot
@@ -813,7 +813,7 @@ class Peer:
 				(digest, signer) = v
 				if signer.verify(digest, ack.data):
 					ackID = k #The ack is good!
-		if ackID != None:
+		if ackID is not None:
 			print("Message delivered and acknowledged: " + ackID)
 			del self.awaitingAcks[ackID] #No need to keep this around
 		self.messagesSet.add(ack.data)
@@ -825,7 +825,7 @@ class Peer:
 		digest = SHA256.new()
 		digest.update(decryptedMessage)
 		sender = "???"
-		if signature == None:
+		if signature is None:
 			return sender
 		for k, v in self.friends.items():
 			(cipher, signer) = v
