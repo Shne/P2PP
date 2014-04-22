@@ -225,7 +225,7 @@ while True:
 
 	match = re.match(r"kmessage ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$", do)
 	if match:
-		thisPeer.kSendMessage(match.group(1), match.group(2), 1, 10) #Note very low TTL
+		thisPeer.kSendMessage(match.group(1), match.group(2), 64, 32) #Note very low TTL
 		continue
 
 	match = re.match(r"friend ([a-zA-Z0-9]+) (.+)$", do)

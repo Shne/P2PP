@@ -4,7 +4,7 @@ import random
 
 
 
-numberOfPeers = 20
+numberOfPeers = 100
 
 names = ['P'+str(x) for x in range(numberOfPeers)]
 IP = 'localhost'
@@ -22,4 +22,4 @@ for (i,name) in enumerate(names):
 	peer.startFindingNeighbours()
 	peer.startLookingForDeadNeighbours()
 
-input()
+input('>')

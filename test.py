@@ -5,10 +5,14 @@
 import time
 import pexpect
 
+timeout = 5
+msg = 'plplplplplp'
 try:
-	setup = pexpect.spawn('./setup.py', timeout=5)
-	herp = pexpect.spawn('./interactive_peer.py localhost 8200 herp 5', timeout=5)
-	derp = pexpect.spawn('./interactive_peer.py localhost 8201 derp 5', timeout=5)
+	setup = pexpect.spawn('./setup.py', timeout=30)
+	setup.expect('>')
+	print('setup.py done')
+	herp = pexpect.spawn('./interactive_peer.py localhost 8500 herp 5', timeout=timeout)
+	derp = pexpect.spawn('./interactive_peer.py localhost 8501 derp 5', timeout=timeout)
 
 	#setup herp
 	herp.expect('>')
@@ -25,7 +29,7 @@ try:
 	derp.expect('>')
 
 	# wait for network to manifest
-	time.sleep(2)
+	time.sleep(3)
 
 	# befriend eachother
 	herp.sendline('friend derp public2.pem')
@@ -34,11 +38,10 @@ try:
 	derp.expect('>')
 
 	#send message via flooding
-	msg = 'plplplplplp'
-	herp.sendline('message derp '+msg)
-	derp.expect('Received Message from herp: '+msg+'\r\n')
-	herp.expect('derp received message! \(verified\)\r\n')
-	print('Flooding message success!')
+	# herp.sendline('message derp '+msg)
+	# derp.expect('Received Message from herp: '+msg+'\r\n')
+	# herp.expect('derp received message! \(verified\)\r\n')
+	# print('Flooding message success!')
 
 	# send message via k walker
 	herp.sendline('kmessage derp '+msg)
