@@ -26,6 +26,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA256
 
+import ssl
 
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
 	def _dispatch(self, method, params):
@@ -63,10 +64,9 @@ def strName(string):
 def strMake(name, address, limit):
 	return name+'@'+address+'|'+limit
 
-
 def makeProxy(IPPort):
-	url = "http://"+IPPort
-	return xmlrpc.client.ServerProxy(url);
+	url = "https://"+IPPort
+	return xmlrpc.client.ServerProxy(url)
 
 def hash(data):
 	h = SHA256.new()
@@ -230,6 +230,7 @@ class Peer:
 
 	def startXMLRPCServer(self):
 		server = RPCThreading((self.IP, self.port), logRequests=False, allow_none=True)
+		server.socket = ssl.wrap_socket(server.socket)
 		server.register_introspection_functions()
 
 		server.register_instance(self)
