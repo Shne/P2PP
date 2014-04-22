@@ -24,8 +24,6 @@ Improvement: Work out something better for k/ttl for k-walker delivery #jhk: wha
 
 Error-proof k-walker/ack connection errors (See flooding version for guidance)
 
-encrypt all xml-rpc traffic. use Diffie-Hellman to exchange secret
-	#the xml-rpc traffic could possibly be wrapped like this: http://stackoverflow.com/questions/5690733/xmlrpc-server-over-https-in-python-3/18444798#18444798
-	#some example Diffie-Hellman python code:
-		http://code.google.com/p/zs-crypto/source/browse/zs/tools/diffie_hellman.py?r=8017268f3e472f4f2f671eb9595ee9574e07b5c7
-		http://blog.markloiseau.com/2013/01/diffie-hellman-tutorial-in-python/
+~~encrypt all xml-rpc traffic. use Diffie-Hellman to exchange secret~~
+
+Improvement: Persist neighbour connections (DH is wicked expensive, use a cache dict)

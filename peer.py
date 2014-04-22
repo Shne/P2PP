@@ -28,6 +28,8 @@ from Crypto.Hash import SHA256
 
 import ssl
 
+import http.client
+
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
 	def _dispatch(self, method, params):
 		func = None
@@ -42,6 +44,16 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			traceback.print_exc()
 			raise
 		
+class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
+	def make_connection(self, host):
+		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) 
+		context.set_ciphers("ADH") #Anonymous Diffie Hellman, requires no certs
+		context.load_dh_params("DH.pem") #Precomputed DH primes
+
+		context.check_hostname = False
+		h = http.client.HTTPSConnection(host, context = context)
+
+		return h
 
 	###########
 	# Helpers #
@@ -66,7 +78,7 @@ def strMake(name, address, limit):
 
 def makeProxy(IPPort):
 	url = "https://"+IPPort
-	return xmlrpc.client.ServerProxy(url)
+	return xmlrpc.client.ServerProxy(url, transport = DHTransport())
 
 def hash(data):
 	h = SHA256.new()
@@ -230,7 +242,14 @@ class Peer:
 
 	def startXMLRPCServer(self):
 		server = RPCThreading((self.IP, self.port), logRequests=False, allow_none=True)
-		server.socket = ssl.wrap_socket(server.socket)
+
+		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) #See DHTransport
+		context.set_ciphers("ADH")
+		context.load_dh_params("DH.pem")
+
+		context.check_hostname = False
+
+		server.socket = context.wrap_socket(server.socket, server_side=True)
 		server.register_introspection_functions()
 
 		server.register_instance(self)
