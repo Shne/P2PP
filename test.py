@@ -5,52 +5,52 @@
 import time
 import pexpect
 
-timeout = 5
+timeout = 30
 msg = 'plplplplplp'
 try:
 	setup = pexpect.spawn('./setup.py', timeout=30)
 	setup.expect('>')
 	print('setup.py done')
-	herp = pexpect.spawn('./interactive_peer.py localhost 8500 herp 5', timeout=timeout)
-	derp = pexpect.spawn('./interactive_peer.py localhost 8501 derp 5', timeout=timeout)
+	peer1 = pexpect.spawn('./interactive_peer.py localhost 8500 peer1 5', timeout=timeout)
+	peer2 = pexpect.spawn('./interactive_peer.py localhost 8501 peer2 5', timeout=timeout)
 
-	#setup herp
-	herp.expect('>')
-	herp.sendline('secret private.pem')
-	herp.expect('>')
-	herp.sendline('hello')
-	herp.expect('>')
+	#setup peer1
+	peer1.expect('>')
+	peer1.sendline('secret private.pem')
+	peer1.expect('>')
+	peer1.sendline('hello')
+	peer1.expect('>')
 
-	#setup derp
-	derp.expect('>')
-	derp.sendline('secret private2.pem')
-	derp.expect('>')
-	derp.sendline('hello')
-	derp.expect('>')
+	#setup peer2
+	peer2.expect('>')
+	peer2.sendline('secret private2.pem')
+	peer2.expect('>')
+	peer2.sendline('hello')
+	peer2.expect('>')
 
 	# wait for network to manifest
 	time.sleep(3)
 
 	# befriend eachother
-	herp.sendline('friend derp public2.pem')
-	herp.expect('>')
-	derp.sendline('friend herp public.pem')
-	derp.expect('>')
+	peer1.sendline('friend peer2 public2.pem')
+	peer1.expect('>')
+	peer2.sendline('friend peer1 public.pem')
+	peer2.expect('>')
 
 	#send message via flooding
-	# herp.sendline('message derp '+msg)
-	# derp.expect('Received Message from herp: '+msg+'\r\n')
-	# herp.expect('derp received message! \(verified\)\r\n')
+	# peer1.sendline('message peer2 '+msg)
+	# peer2.expect('Received Message from peer1: '+msg+'\r\n')
+	# peer1.expect('peer2 received message! \(verified\)\r\n')
 	# print('Flooding message success!')
 
 	# send message via k walker
-	herp.sendline('kmessage derp '+msg)
-	derp.expect('Received Message from herp: '+msg+'\r\n')
-	herp.expect('Message delivered and acknowledged:.+\r\n')
+	peer1.sendline('kmessage peer2 '+msg)
+	peer2.expect('Received Message from peer1: '+msg+'\r\n')
+	peer1.expect('Message delivered and acknowledged:.+\r\n')
 	print('KWalker message success!')
 except pexpect.TIMEOUT as err:
-	print('herp.before: '+str(herp.before))
-	print('herp.after: '+str(herp.after))
-	print('derp.before: '+str(derp.before))
-	print('derp.after: '+str(derp.after))
+	print('peer1.before: '+str(peer1.before))
+	print('peer1.after: '+str(peer1.after))
+	print('peer2.before: '+str(peer2.before))
+	print('peer2.after: '+str(peer2.after))
 	raise err

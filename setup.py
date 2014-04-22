@@ -4,7 +4,7 @@ import random
 
 
 
-numberOfPeers = 15
+numberOfPeers = 50
 
 names = ['P'+str(x) for x in range(numberOfPeers)]
 IP = 'localhost'
