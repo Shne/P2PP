@@ -3,9 +3,22 @@ Talk About:
 How we are not Crypto ppl
 RSA
 RSAES-OAEP
+SHA-256
+SSL + ADH
+RPC
 
 Encrypting Messages
 Hiding Recipients
+Signing messages
+Encrypting peers
+Cover Traffic
+Closing RPC calls
+
+Known Vulnerabilites:
+MitM due to ADH
+Traffick analysis if entire network can be monitored
+Python xmlrpc-client is vulnerable to malformed xml
 
 
-Tarzan, GIA, Freenet, TeleHash, BitMessage
+
+Tarzan, GIA, Freenet, TeleHash, BitMessage, Pycrypto, Openssl
