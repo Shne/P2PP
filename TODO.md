@@ -28,6 +28,6 @@ Error-proof k-walker/ack connection errors (See flooding version for guidance)
 
 Improvement: Persist neighbour connections (DH is wicked expensive, use a cache dict)
 
-Cover traffic (Just call a dummy xml function with some dummy data at random intervals)
+~~Cover traffic (Just call a dummy xml function with some dummy data at random intervals)~~
 
 Key distribution (Already have a key-value store, just store the public key (it's already text) under the key of its hash (base64)), remember to check if the hash matches when retrieved

@@ -4,7 +4,7 @@ import random
 
 
 
-numberOfPeers = 50
+numberOfPeers = 10
 
 names = ['P'+str(x) for x in range(numberOfPeers)]
 IP = 'localhost'
@@ -21,5 +21,6 @@ for (i,name) in enumerate(names):
 	peer.startListeningForMulticast()
 	peer.startFindingNeighbours()
 	peer.startLookingForDeadNeighbours()
+	peer.startSendingCoverTraffic()
 
 input('>')

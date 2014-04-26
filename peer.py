@@ -30,6 +30,10 @@ import ssl
 
 import http.client
 
+	#########################
+	# Classes for safer RPC #
+	#########################
+
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
 	def _dispatch(self, method, params):
 		func = None
@@ -92,6 +96,9 @@ def nonceMsg(msg):
 
 def unnonceMsg(noncedMsg, nonce):
 	return noncedMsg[:0-len(str(nonce))]
+
+def getRandomString(N):
+	return ('%0' + str(N) + 'x') % random.randrange(16**N)
 
 #Fuctions tagged as @RPC will get the correct attribute
 def RPC(func):
@@ -725,6 +732,10 @@ class Peer:
 		except FileNotFoundError:
 			print("Error, private key not found")
 
+	#####################
+	# Flooding Messages #
+	#####################
+
 	#Send a message to a friend, not that you need to set up his public key first, fully async.
 	def sendMessage(self, recipient, message):
 		try:
@@ -788,6 +799,10 @@ class Peer:
 			return None
 		# forwardThread = threading.Thread(target=peerProxy.receiveMessage, args=(message,)) #The comma, I have no idea
 		# forwardThread.start()
+
+	#####################
+	# K-Walker Messages #
+	#####################
 
 	def kSendMessage(self, recipient, message, k, ttl):
 		messageID = self.newSearchId()
@@ -865,3 +880,25 @@ class Peer:
 			else:
 				pass
 		return sender
+
+	##################
+	# Cover Traffic  #
+	##################
+
+	@RPC
+	def coverTraffic(self, mes):
+		return getRandomString(random.randrange(1, 50))
+
+	def startSendingCoverTraffic(self):
+		threading.Thread(target = self.sendCoverTraffic).start()
+
+	def sendCoverTraffic(self):
+		while True:
+			if len(self.neighbourSet) is not 0:
+				peer = random.sample(self.neighbourSet, 1)[0]
+				try:
+					makeProxy(strAddress(peer)).coverTraffic(getRandomString(random.randrange(1, 50)))
+				except ConnectionError as err:
+					self.evictPeers([peer])
+			time.sleep(random.randrange(0, 50))
+

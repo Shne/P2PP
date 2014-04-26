@@ -61,6 +61,7 @@ while True:
 		thisPeer.startListeningForMulticast()
 		thisPeer.startFindingNeighbours()
 		thisPeer.startLookingForDeadNeighbours()
+		thisPeer.startSendingCoverTraffic()
 		continue
 
 	match = re.match(r"hello\s((\d+\.\d+\.\d+\.\d+\:\d+)|localhost\:\d+)", do)
@@ -70,6 +71,7 @@ while True:
 		thisPeer.startListeningForMulticast()
 		thispeer.startFindingNeighbours()
 		thisPeer.startLookingForDeadNeighbours()
+		thisPeer.startSendingCoverTraffic()
 		continue
 
 
