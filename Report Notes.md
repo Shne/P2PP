@@ -11,7 +11,7 @@ Encrypting Messages
 Hiding Recipients
 Signing messages
 Encrypting peers
-Cover Traffic
+Cover Traffic - By way of SSL, note, small data, small messages
 Closing RPC calls
 
 Known Vulnerabilites:
