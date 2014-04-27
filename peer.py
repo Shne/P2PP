@@ -846,9 +846,15 @@ class Peer:
 				self.kAck(xmlrpc.client.Binary(signature), 32) #TODO:do something smarter about k/ttl
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
-		peerProxy = makeProxy(strAddress(random.sample(self.neighbourSet, 1)[0]))
-		forwardThread = threading.Thread(target=peerProxy.kReceiveMessage, args=(message, nonce, ttl-1, sig))
+		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig))
 		forwardThread.start()
+
+	def safeForwardKWalker(self, message, nonce, ttl, sig):
+		try:
+			peer = random.sample(self.neighbourSet, 1)[0]
+			makeProxy(strAddress(peer)).kReceiveMessage(message, nonce, ttl, sig)
+		except:
+			self.evictPeers([peer])
 
 	@RPC
 	def kAck(self, ack, ttl):
@@ -863,9 +869,16 @@ class Peer:
 					break
 		self.acksSet.add(ack.data) #remember we've checked this ack
 
-		peerProxy = makeProxy(strAddress(random.sample(self.neighbourSet, 1)[0]))
-		forwardThread = threading.Thread(target=peerProxy.kAck, args=(ack, ttl-1))
+		forwardThread = threading.Thread(target=self.safeForwardKAck, args=(ack, ttl-1))
 		forwardThread.start() #To infinity, and beyond!
+
+	def safeForwardKAck(self, ack, ttl):
+		try:
+			peer = random.sample(self.neighbourSet, 1)[0]
+			makeProxy(strAddress(peer)).kAck(ack, ttl)
+		except:
+			self.evictPeers([peer])
+
 
 	def checkSender(self, decryptedMessage, signature):
 		digest = SHA256.new()

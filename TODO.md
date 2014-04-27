@@ -20,9 +20,9 @@ Improvement: Resend until ack is returned (Use higher and higher ttl/k/sleep tim
 
 ~~Improvement: If we send the same message from 2 sources to the same peer, the ack is valid for both, use a Nonce #messages are nonced now~~
 
-Improvement: Work out something better for k/ttl for k-walker delivery #jhk: what is 'better'?
+Improvement: Work out something better for k/ttl for k-walker delivery #jhk: what is 'better'? #kris:Better than 10, as the original used :p
 
-Error-proof k-walker/ack connection errors (See flooding version for guidance)
+~~Error-proof k-walker/ack connection errors (See flooding version for guidance)~~
 
 ~~encrypt all xml-rpc traffic. use Diffie-Hellman to exchange secret~~
 
