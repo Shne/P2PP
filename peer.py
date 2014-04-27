@@ -47,14 +47,14 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 		except:
 			traceback.print_exc()
 			raise
-		
+
 class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 	def __init__(self, use_datetime=False, use_builtin_types=False):
 		self._use_datetime = use_datetime
 		self._use_builtin_types = use_builtin_types
 		self._connection = (None, None)
 		self._extra_headers = []
-		self.connection = None
+		self.connections = []
 		self.host = None
 
 	def make_connection(self, host):
@@ -64,12 +64,16 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 
 		context.check_hostname = False
 
-		if(not (self.host == host) or (self.connection is None) or self.connection._HTTPConnection__state != 'Idle'):
+		if not (self.host == host):
+			connections = []
 			self.host = host
-			self.connection = http.client.HTTPSConnection(host, context = context)
-			return self.connection
+		viables = [connection for connection in self.connections if connection._HTTPConnection__state == 'Idle']
+		if len(viables) is 0:
+			connection = http.client.HTTPSConnection(host, context = context)
+			self.connections.append(connection)
+			return connection
 		else:
-			return self.connection
+			return viables[0]
 		
 
 	###########

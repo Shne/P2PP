@@ -13,6 +13,7 @@ Signing messages
 Encrypting peers
 Cover Traffic - By way of SSL, note, small data, small messages
 Closing RPC calls
+Connection Pooling
 
 Known Vulnerabilites:
 MitM due to ADH
