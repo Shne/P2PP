@@ -5,11 +5,11 @@
 import time
 import pexpect
 
-timeout = 200
+timeout = 90
 msg = 'plplplplplp'
 try:
 	start = time.time()
-	setup = pexpect.spawn('./setup.py', timeout=90)
+	setup = pexpect.spawn('./setup.py', timeout=30)
 	setup.expect('>')
 	print('setup.py done')
 	peer1 = pexpect.spawn('./interactive_peer.py localhost 8500 peer1 5', timeout=timeout)

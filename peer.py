@@ -49,15 +49,31 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			raise
 		
 class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
+	#def __init__(self, use_datetime=False, use_builtin_types=False):
+	#	self._use_datetime = use_datetime
+	#	self._use_builtin_types = use_builtin_types
+	#	self._connection = (None, None)
+	#	self._extra_headers = []
+	#	self.connection = None
+	#	self.host = None
+
 	def make_connection(self, host):
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) 
 		context.set_ciphers("ADH") #Anonymous Diffie Hellman, requires no certs
 		context.load_dh_params("DH.pem") #Precomputed DH primes
 
 		context.check_hostname = False
-		h = http.client.HTTPSConnection(host, context = context)
 
+		h = http.client.HTTPSConnection(host, context = context)
 		return h
+
+		# if(not (self.host == host) or (self.connection is None)):
+		# 	self.host = host
+		# 	self.connection = http.client.HTTPSConnection(host, context = context)
+		# 	return self.connection
+		# else:
+		# 	return self.connection
+		
 
 	###########
 	# Helpers #
@@ -158,6 +174,8 @@ class Peer:
 
 	def makeProxy(self, IPPort):
 		url = "https://"+IPPort
+		#return xmlrpc.client.ServerProxy(url, transport = DHTransport())
+
 		if(url in self.connections):
 			return self.connections[url]
 		else:
@@ -375,7 +393,6 @@ class Peer:
 							# we already had this neighbour
 							self.neighbourSemaphore.release()
 						return True
-
 			if Z is None:
 				# no such neighbour -> reject
 				return False
