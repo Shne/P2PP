@@ -3,8 +3,8 @@ from peer import Peer
 import random
 
 
-
 numberOfPeers = 100
+
 
 names = ['P'+str(x) for x in range(numberOfPeers)]
 IP = 'localhost'

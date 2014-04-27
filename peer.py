@@ -49,13 +49,13 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			raise
 		
 class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
-	#def __init__(self, use_datetime=False, use_builtin_types=False):
-	#	self._use_datetime = use_datetime
-	#	self._use_builtin_types = use_builtin_types
-	#	self._connection = (None, None)
-	#	self._extra_headers = []
-	#	self.connection = None
-	#	self.host = None
+	def __init__(self, use_datetime=False, use_builtin_types=False):
+		self._use_datetime = use_datetime
+		self._use_builtin_types = use_builtin_types
+		self._connection = (None, None)
+		self._extra_headers = []
+		self.connection = None
+		self.host = None
 
 	def make_connection(self, host):
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) 
@@ -64,15 +64,12 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 
 		context.check_hostname = False
 
-		h = http.client.HTTPSConnection(host, context = context)
-		return h
-
-		# if(not (self.host == host) or (self.connection is None)):
-		# 	self.host = host
-		# 	self.connection = http.client.HTTPSConnection(host, context = context)
-		# 	return self.connection
-		# else:
-		# 	return self.connection
+		if(not (self.host == host) or (self.connection is None) or self.connection._HTTPConnection__state != 'Idle'):
+			self.host = host
+			self.connection = http.client.HTTPSConnection(host, context = context)
+			return self.connection
+		else:
+			return self.connection
 		
 
 	###########
