@@ -26,7 +26,7 @@ Improvement: Work out something better for k/ttl for k-walker delivery #jhk: wha
 
 ~~encrypt all xml-rpc traffic. use Diffie-Hellman to exchange secret~~
 
-Improvement: Persist neighbour connections (DH is wicked expensive, use a cache dict)
+Improvement: Persist neighbour connections (DH is wicked expensive, use a cache dict) #roland
 
 ~~Cover traffic (Just call a dummy xml function with some dummy data at random intervals)~~
 

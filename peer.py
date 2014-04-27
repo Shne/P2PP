@@ -90,9 +90,9 @@ def hash(data):
 	return h.digest()
 
 def nonceMsg(msg):
-	nonce = random.random()
-	noncedMsg = msg + str(nonce)
-	return (noncedMsg, nonce)
+    nonce = random.random()
+    noncedMsg = msg + str(nonce)
+    return (noncedMsg, nonce)
 
 def unnonceMsg(noncedMsg, nonce):
 	return noncedMsg[:0-len(str(nonce))]
