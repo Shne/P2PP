@@ -69,7 +69,6 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 			self.connection = http.client.HTTPSConnection(host, context = context)
 			return self.connection
 		else:
-			print("CACHE")
 			return self.connection
 		
 
