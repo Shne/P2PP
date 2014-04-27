@@ -80,9 +80,7 @@ def strName(string):
 def strMake(name, address, limit):
 	return name+'@'+address+'|'+limit
 
-def makeProxy(IPPort):
-	url = "https://"+IPPort
-	return xmlrpc.client.ServerProxy(url, transport = DHTransport())
+
 
 def hash(data):
 	h = SHA256.new()
@@ -152,6 +150,20 @@ class Peer:
 		self.acksSet = set([])
 		self.awaitingAcks = dict()
 
+		self.connections = dict()
+
+	##################################
+	# Make connection and cache it   #
+	##################################
+
+	def makeProxy(self, IPPort):
+		url = "https://"+IPPort
+		if(url in self.connections):
+			return self.connections[url]
+		else:
+			self.connections[url] = xmlrpc.client.ServerProxy(url, transport = DHTransport())
+			return self.connections[url]
+
 	#######################
 	# Simple peer listing #
 	#######################
@@ -172,7 +184,7 @@ class Peer:
 	def sayHello(self,IPPort):
 		try:
 			# print('saying hello to '+IPPort)
-			serverProxy = makeProxy(IPPort)
+			serverProxy = self.makeProxy(IPPort)
 			contactList = serverProxy.hello(self.name, self.address, self.peerLimit)
 			# print(IPPort+' gave contact list: ')
 			# print(contactList)
@@ -278,7 +290,7 @@ class Peer:
 			print("Fetching neighbour lists:" + str(i) + "/" + str(len(remList)))
 			pname = strName(peer) + "(" + strLimit(peer) + ")"
 			try:
-				neighbourDict[pname] = makeProxy(strAddress(peer)).listNeighbours()
+				neighbourDict[pname] = self.makeProxy(strAddress(peer)).listNeighbours()
 			except ConnectionError as err:
 				neighbourDict[pname] = []
 		return neighbourDict
@@ -313,7 +325,7 @@ class Peer:
 		if(len(potentials) != 0):
 			neighbour = random.choice(potentials)
 			try:
-				if makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit):
+				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit):
 					if neighbour not in self.neighbourSet:
 						with self.neighbourSetLock:
 							self.neighbourSet.update([neighbour])
@@ -350,7 +362,7 @@ class Peer:
 			ZDegree = 0
 			for n in subset:
 				try:
-					nDegree = makeProxy(strAddress(n)).getNeighbourDegree()
+					nDegree = self.makeProxy(strAddress(n)).getNeighbourDegree()
 					if nDegree > ZDegree:
 						Z = n
 						ZDegree = nDegree
@@ -370,7 +382,7 @@ class Peer:
 
 			neighbourMaxCapacity = max([strLimit(n) for n in self.neighbourSet])
 			try:
-				YDegree = makeProxy(address).getNeighbourDegree()
+				YDegree = self.makeProxy(address).getNeighbourDegree()
 			except ConnectionError as err:
 				print(self.name+': Error getting neighbourhood degree from peer ' + Y + str(err))
 				return False
@@ -382,7 +394,7 @@ class Peer:
 						return False #Someone stole our neighbour!!! Damn them!
 				self.addNeighbour(Y)
 				try:
-					makeProxy(strAddress(Z)).removeNeighbour(self.myString)
+					self.makeProxy(strAddress(Z)).removeNeighbour(self.myString)
 				except ConnectionError as err:
 					print (self.name+': Error removing myself as neighbour from peer ' + Z + str(err))
 					self.evictPeers([Z])
@@ -418,7 +430,7 @@ class Peer:
 
 	def pollPeer(self,IPPort):
 		try:
-			server = makeProxy(IPPort)			
+			server = self.makeProxy(IPPort)			
 			return server.ping()
 		except ConnectionError as err:
 			print(self.name+": Neighbourhood polling shows " + IPPort + " is dead")
@@ -478,7 +490,7 @@ class Peer:
 	def floodHelper(self, peer, key, searchId, TTL):
 		try:
 			self.messagesPassed += 1
-			res = makeProxy(strAddress(peer)).floodSearch(key, searchId, TTL-1)
+			res = self.makeProxy(strAddress(peer)).floodSearch(key, searchId, TTL-1)
 			if res is not None:
 				self.resourceMap[key] = res
 		except ConnectionError as err:
@@ -512,7 +524,7 @@ class Peer:
 
 	def get(self, key):
 		try:
-			return makeProxy(strAddress(self.resourceMap[key])).getResource(key)
+			return self.makeProxy(strAddress(self.resourceMap[key])).getResource(key)
 		except ConnectionError as err:
 			print(self.name+": get failed for " + key + " at " + self.resourceMap[key] + ". is dead.")
 			self.evictPeers(self.resourceMap[key])
@@ -534,7 +546,7 @@ class Peer:
 		if TTL % 4 is 0: # only check each 4th step
 			try:
 				self.messagesPassed += 1
-				if makeProxy(strAddress(originalSourcePeer)).hasKeyBeenFound(key):
+				if self.makeProxy(strAddress(originalSourcePeer)).hasKeyBeenFound(key):
 					return
 			except ConnectionError as err:
 				print(self.name+": k-walker check for search relevancy failed at " + originalSourcePeer + ". is dead.")
@@ -546,7 +558,7 @@ class Peer:
 		if key in self.resources.keys():
 			try:
 				self.messagesPassed += 1
-				makeProxy(strAddress(originalSourcePeer)).walkerResultFound(key, self.myString)
+				self.makeProxy(strAddress(originalSourcePeer)).walkerResultFound(key, self.myString)
 			except ConnectionError as err:
 				print(self.name+": k-walker result delivery failed at " + originalSourcePeer + ". is dead.")
 				self.evictPeers([originalSourcePeer])
@@ -594,7 +606,7 @@ class Peer:
 		
 	def forwardWalker(self, peer, key, k, searchId, TTL, originalSourcePeer, sourcePeer):
 		self.messagesPassed += 1
-		peerProxy = makeProxy(strAddress(peer))
+		peerProxy = self.makeProxy(strAddress(peer))
 		walkerThread = threading.Thread(target=peerProxy.handleWalkers, args=(key, k, searchId, TTL, originalSourcePeer, sourcePeer))
 		walkerThread.start()
 		
@@ -618,11 +630,11 @@ class Peer:
 
 	@RPC
 	def getAllMessagesPassed(self):
-		return sum([makeProxy(strAddress(p)).getMessagesPassed() for p in self.peerSet])
+		return sum([self.makeProxy(strAddress(p)).getMessagesPassed() for p in self.peerSet])
 
 	@RPC
 	def getMessagesPerPeer(self):
-		return {strName(peer) +"(" +  strLimit(peer) + ")" : makeProxy(strAddress(peer)).getMessagesPassed() for peer in self.peerSet}
+		return {strName(peer) +"(" +  strLimit(peer) + ")" : self.makeProxy(strAddress(peer)).getMessagesPassed() for peer in self.peerSet}
 
 	@RPC
 	def resetMessagesCounter(self):
@@ -631,7 +643,7 @@ class Peer:
 	@RPC
 	def resetAllMessagesCounter(self):
 		for p in self.peerSet:
-			makeProxy(strAddress(p)).resetMessagesCounter()
+			self.makeProxy(strAddress(p)).resetMessagesCounter()
 
 	@RPC
 	def resetResourceMap(self):
@@ -640,7 +652,7 @@ class Peer:
 	@RPC
 	def resetAllResourceMaps(self):
 		for p in self.peerSet:
-			makeProxy(strAddress(p)).resetResourceMap()
+			self.makeProxy(strAddress(p)).resetResourceMap()
 
 	@RPC
 	def fullReset(self):
@@ -651,7 +663,7 @@ class Peer:
 	@RPC
 	def fullResetAll(self):
 		for p in self.peerSet:
-			makeProxy(strAddress(p)).fullReset()
+			self.makeProxy(strAddress(p)).fullReset()
 
 	def testHitRate(self, k, TTL, samples):
 		self.resetResourceMap()
@@ -792,7 +804,7 @@ class Peer:
 	def forwardMessage(self, args):
 		(peer, message, sig) = args
 		try:
-			peerProxy = makeProxy(strAddress(peer))
+			peerProxy = self.makeProxy(strAddress(peer))
 			return peerProxy.receiveMessage(message, sig)
 		except ConnectionError as err:
 			self.evictPeers([peer])
@@ -852,7 +864,7 @@ class Peer:
 	def safeForwardKWalker(self, message, nonce, ttl, sig):
 		try:
 			peer = random.sample(self.neighbourSet, 1)[0]
-			makeProxy(strAddress(peer)).kReceiveMessage(message, nonce, ttl, sig)
+			self.makeProxy(strAddress(peer)).kReceiveMessage(message, nonce, ttl, sig)
 		except:
 			self.evictPeers([peer])
 
@@ -875,7 +887,7 @@ class Peer:
 	def safeForwardKAck(self, ack, ttl):
 		try:
 			peer = random.sample(self.neighbourSet, 1)[0]
-			makeProxy(strAddress(peer)).kAck(ack, ttl)
+			self.makeProxy(strAddress(peer)).kAck(ack, ttl)
 		except:
 			self.evictPeers([peer])
 
@@ -910,7 +922,7 @@ class Peer:
 			if len(self.neighbourSet) is not 0:
 				peer = random.sample(self.neighbourSet, 1)[0]
 				try:
-					makeProxy(strAddress(peer)).coverTraffic(getRandomString(random.randrange(1, 50)))
+					self.makeProxy(strAddress(peer)).coverTraffic(getRandomString(random.randrange(1, 50)))
 				except ConnectionError as err:
 					self.evictPeers([peer])
 			time.sleep(random.randrange(0, 50))

@@ -5,10 +5,11 @@
 import time
 import pexpect
 
-timeout = 30
+timeout = 200
 msg = 'plplplplplp'
 try:
-	setup = pexpect.spawn('./setup.py', timeout=30)
+	start = time.time()
+	setup = pexpect.spawn('./setup.py', timeout=90)
 	setup.expect('>')
 	print('setup.py done')
 	peer1 = pexpect.spawn('./interactive_peer.py localhost 8500 peer1 5', timeout=timeout)
@@ -48,6 +49,10 @@ try:
 	peer2.expect('Received Message from peer1: '+msg+'\r\n')
 	peer1.expect('Message delivered and acknowledged:.+\r\n')
 	print('KWalker message success!')
+
+	end = time.time()
+	print(end-start)
+
 except pexpect.TIMEOUT as err:
 	print('peer1.before: '+str(peer1.before))
 	print('peer1.after: '+str(peer1.after))
