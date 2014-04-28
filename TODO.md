@@ -32,4 +32,10 @@ Improvement: Evict proxy cache for dead peers
 
 ~~Cover traffic (Just call a dummy xml function with some dummy data at random intervals)~~
 
-Key distribution (Already have a key-value store, just store the public key (it's already text) under the key of its hash (base64)), remember to check if the hash matches when retrieved
+~~Key distribution (Already have a key-value store, just store the public key (it's already text) under the key of its hash (base64)), remember to check if the hash matches when retrieved~~
+
+Prettyness: Move special classes to their own file
+
+Prettyness: Store ssl context
+
+Prettyness: Clean up kris' code
