@@ -30,6 +30,8 @@ import ssl
 
 import http.client
 
+import base64
+
 	#########################
 	# Classes for safer RPC #
 	#########################
@@ -68,7 +70,7 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 			connections = []
 			self.host = host
 		viables = [connection for connection in self.connections if connection._HTTPConnection__state == 'Idle']
-		if len(viables) is 0:
+		if len(viables) == 0:
 			connection = http.client.HTTPSConnection(host, context = context)
 			self.connections.append(connection)
 			return connection
@@ -561,7 +563,7 @@ class Peer:
 	@RPC
 	def handleWalkers(self, key, k, searchId, TTL, originalSourcePeer, sourcePeer):
 		#has the original source peer already found a result?
-		if TTL % 4 is 0: # only check each 4th step
+		if TTL % 4 == 0: # only check each 4th step
 			try:
 				self.messagesPassed += 1
 				if self.makeProxy(strAddress(originalSourcePeer)).hasKeyBeenFound(key):
@@ -583,14 +585,14 @@ class Peer:
 				return # no reason to continue search
 			
 		# should the walker die here?
-		if TTL is 0:
+		if TTL == 0:
 			return
 		
 		# calculate which neighbours are eligible to be sent this search (not having been sent the same search before from this this peer)
 		neighboursHavingSeenThisSearch = self.walkerSearchSentToNeighbours.get(searchId, [originalSourcePeer])
 		neighboursHavingSeenThisSearch.append(sourcePeer)
 		eligibleNeighbours = [n for n in self.neighbourSet if n not in neighboursHavingSeenThisSearch]
-		if len(eligibleNeighbours) is 0:
+		if len(eligibleNeighbours) == 0:
 			return
 
 		neighboursSentThisSearch = []
@@ -744,19 +746,55 @@ class Peer:
 	##############
 
 	#Add a friend with a simple name, and assign him the given public key
-	def addFriend(self, name, key):
+	def addFriend(self, name, keyFile):
 		try:
-			publickey = RSA.importKey(open(key, 'r+b').read())
+			key = open(keyFile, 'r+b').read()
+			publickey = RSA.importKey(key)
 			cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
 			signer = PKCS1_v1_5.new(publickey)
 			self.friends[name] = (cipher, signer)
 		except FileNotFoundError:
 			print("Error, public key not found")
 
-	#Set up your own private key
-	def setSecret(self, key):
+	def fetchFriend(self, name, keyHash):
+		self.expandingRingFind(keyHash)
+		key = self.get(keyHash)
+		if(key is None):
+			print("Unable to find friend")
+			return
+
+		#Better make sure things fit
+		digest = SHA256.new()
+		digest.update(key.encode('utf-8'))
+		newHash = base64.b64encode(digest.digest()).decode('utf-8')
+		if keyHash != newHash:
+			print("Hash mismatch, got: "+ newHash + " expected: " + keyHash)
+			return
+
+		publickey = RSA.importKey(key.encode('utf8'))
+		cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
+		signer = PKCS1_v1_5.new(publickey)
+		self.friends[name] = (cipher, signer)
+
+	def publishKey(self, keyFile):
 		try:
-			privateKey = RSA.importKey(open(key, 'r+b').read()) #Oh shit, this read 'private.pem', I was scared there
+			key = open(keyFile, 'r+b').read()
+			#Store the key in our own network
+			digest = SHA256.new()
+			digest.update(key)
+			keyHash = base64.b64encode(digest.digest()).decode('utf-8')
+			
+			self.addResource(keyHash, key.decode('utf-8'))
+			
+			print("key added as: " + keyHash)
+		except FileNotFoundError:
+			print("Error, public key not found")
+
+	#Set up your own private key
+	def setSecret(self, keyFile):
+		try:
+			key = open(keyFile, 'r+b').read()
+			privateKey = RSA.importKey(key) #Oh shit, this read 'private.pem', I was scared there
 			self.cipher = PKCS1_OAEP.new(privateKey)
 			self.signer = PKCS1_v1_5.new(privateKey)
 		except FileNotFoundError:
@@ -937,7 +975,7 @@ class Peer:
 
 	def sendCoverTraffic(self):
 		while True:
-			if len(self.neighbourSet) is not 0:
+			if len(self.neighbourSet) != 0:
 				peer = random.sample(self.neighbourSet, 1)[0]
 				try:
 					self.makeProxy(strAddress(peer)).coverTraffic(getRandomString(random.randrange(1, 50)))

@@ -240,5 +240,15 @@ while True:
 		thisPeer.setSecret(match.group(1))
 		continue
 
+	match = re.match(r"publish (.+)$", do)
+	if match:
+		thisPeer.publishKey(match.group(1))
+		continue
+
+	match = re.match(r"fetch-friend ([a-zA-Z0-9]+) (.+)$", do)
+	if match:
+		thisPeer.fetchFriend(match.group(1), match.group(2))
+		continue
+
 	# DEFAULT
 	print('Command not recognized')

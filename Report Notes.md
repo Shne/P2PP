@@ -23,3 +23,5 @@ Python xmlrpc-client is vulnerable to malformed xml
 
 
 Tarzan, GIA, Freenet, TeleHash, BitMessage, Pycrypto, Openssl
+
+Count number of DH connection
