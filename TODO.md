@@ -39,3 +39,9 @@ Prettyness: Move special classes to their own file
 Prettyness: Store ssl context
 
 Prettyness: Clean up kris' code
+
+Proof of work (Calculate partial hash collision on address)
+
+Look into group chat
+
+Testing: Create tests to measure stuff (Time to form network, time to send message, k-walker hit rate, cardinality of DH pools)
