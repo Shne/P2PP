@@ -1,0 +1,60 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage[export]{adjustbox}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{subcaption}
+\usepackage[toc]{appendix}
+\usepackage{fullpage}
+
+\title{Peer to Peer Networks}
+
+\date{\today}
+
+\author{Jan H. Knudsen (20092926)
+\and
+Roland L. Pedersen (20092817)
+\and
+Kris V. Ebbesen (20094539)
+}
+
+%************************************************************
+\usepackage{graphicx}
+	\setkeys{Gin}{width=\textwidth}
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\input{intro}
+
+\input{usecase}
+
+\input{crypto}
+
+\input{method}
+
+\input{experiments}
+
+\input{related}
+
+\input{manual}
+
+\input{conclusion}
+
+\bibliographystyle{IEEEtran}
+\begin{thebibliography}{1}
+	\bibitem{GIA}{Making Gnutella-like P2P systems scalable
+	\sc{Chawathe, Yatin and Ratnasamy, Sylvia and Breslau, Lee and Lanham, Nick and Shenker, Scott}}
+	\newblock{2003}
+\end{thebibliography}
+
+\input{appendices}
+
+
+\end{document}
+
+
+
