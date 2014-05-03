@@ -99,8 +99,6 @@ def strName(string):
 def strMake(name, address, limit):
 	return name+'@'+address+'|'+limit
 
-
-
 def hash(data):
 	h = SHA256.new()
 	h.update(data)

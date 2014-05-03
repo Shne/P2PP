@@ -1,0 +1,5 @@
+\BOOKMARK [1][-]{section.1}{A short note on cryptography}{}% 1
+\BOOKMARK [1][-]{section.2}{Method of Operation}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Base System}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Encrypting Messages and Hiding Recipients}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Encrypting Peer Communication}{section.2}% 5

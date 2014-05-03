@@ -1,0 +1,31 @@
+\section{Method of Operation}
+
+\subsection{Base System}
+
+The system described is built atop the unstructured network developed during the P2PN course (TODO: ref earlier P2PN report). This network contains very little structural information, and bases its topology on the GIA network~\citep{GIA}.
+
+The choice of this network was made based on its simplicity and extendibility, and due to the fact that unstructured networks require little information about the peers involved, making it difficult the track which peers are doing what. 
+
+Note that the techniques used to extend the network could be applied to most unstructured networks, and would probably work just as well on the GIA network.
+
+\subsection{Encrypting Messages and Hiding Recipients}
+
+In order to ensure that no adversaries can divulge the content of any given message, we encrypt chat messages travelling across the network using RSA-OAEP~\citep{OAEP}. RSA-OAEP was chosen due to its ease of use, and security against repeated plaintext attacks.
+
+When performing this encryption, we use a pair of RSA (TODO:Mayby reference?) keys. The sender must obtain the public key of the final recipient (how to do this will be explained later), in order to encrypt the message.
+
+When the chat message is sent, it is first encrypted by RSA-OAEP using the public key of the recipient, and then broadcast across the network using either flooding or k-walkers. Whenever a peer receives a messages travelling across the network, it will attempt to decrypt it using the corresponding RSA-OAEP decrypting using its own private key. This will fail for all peers except the recipient, ensuring that only the final recipient will be able to obtain the contents of the chat message.
+
+Note that the encrypted message sent across the network contains no delivery address of any kind, and as such no other peers will know the final recipient.
+
+It is also worth noting that only one RSA key pair is required to send messages. The sender needs no private key, nor do any other peers in the network.
+
+\subsection{Encrypting Peer Communication}
+
+All traffic between peers in the network is encrypted using anonymous Diffie-Hellman~\citep{DH} encryption. This encryption is provided by wrapping connections between peers in an SSL layer, with no certificates and anonymous Diffie-Hellman as the only cipher set.
+
+This ensures that peers can communicate without outside parties snooping on the information, therefore, will make it very hard to track messages across the network, since the data sent from messages, cover traffic, and general networks operations will be indistinguishable.
+
+Another reason to use anonymous Diffie-Hellman encryption is that it enforces no requirements on previously distributed keys or identities of the peers, keeping each peer's knowledge about its neighbours at a minimum.
+
+In order to prevent constant Diffie-Hellman key renegotiations we provide cached pools of SSL connections, meaning that we only create a new connection when the peer runs out of idle connections to the same peer.
