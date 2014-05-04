@@ -64,8 +64,6 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 		context.set_ciphers("ADH") #Anonymous Diffie Hellman, requires no certs
 		context.load_dh_params("DH.pem") #Precomputed DH primes
 
-		context.check_hostname = False
-
 		if not (self.host == host):
 			connections = []
 			self.host = host
@@ -284,8 +282,6 @@ class Peer:
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) #See DHTransport
 		context.set_ciphers("ADH")
 		context.load_dh_params("DH.pem")
-
-		context.check_hostname = False
 
 		server.socket = context.wrap_socket(server.socket, server_side=True)
 		server.register_introspection_functions()
