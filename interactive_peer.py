@@ -191,7 +191,7 @@ while True:
 		print('Average Diffie-Hellman connection pool cardinality for '+thisPeer.name+': '+str(thisPeer.getAvgDHCardinality()))
 		continue
 
-	match = re.match(r"dhcard-all", do)
+	match = re.match(r"dhcard-all$", do)
 	if match:
 		print('Average Diffie-Hellman connection pool cardinality in this network: '+str(thisPeer.getAllAvgDHCardinality()))
 		continue
