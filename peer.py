@@ -346,7 +346,7 @@ class Peer:
 			neighbour = random.choice(potentials)
 			try:
 				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit):
-					self.addNeighbour(neighbour)
+					return self.addNeighbour(neighbour)
 			except ConnectionError as err:
 				print (self.name+': ConnectionError when becoming neighbour with ' + neighbour + '. is dead.')
 				self.evictPeers([neighbour])
