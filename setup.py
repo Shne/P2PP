@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 from peer import Peer
 import random
+import argparse
 
+parser = argparse.ArgumentParser(description='Setup Script')
+parser.add_argument('-peers', type=int, help='Number of peers to set up', default=30)
+args = parser.parse_args()
 
-
-numberOfPeers = 30
+numberOfPeers = args.peers
 
 names = ['P'+str(x) for x in range(numberOfPeers)]
 IP = 'localhost'
