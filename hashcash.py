@@ -1,8 +1,9 @@
 #!/usr/bin/env python2.3
 """Implement Hashcash version 1 protocol in Python
-+-------------------------------------------------------+
-| Written by David Mertz; released to the Public Domain |
-+-------------------------------------------------------+
++--------------------------------------------------------------+
+| Written by David Mertz; released to the Public Domain        |
+| This version was edited by Kris Ebbesen (krislinux@gmail.com) |
++--------------------------------------------------------------+
 
 Double spend database not implemented in this module, but stub
 for callbacks is provided in the 'check()' function
