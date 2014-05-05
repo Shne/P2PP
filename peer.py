@@ -51,15 +51,17 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			raise
 
 class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
-	def __init__(self, use_datetime=False, use_builtin_types=False):
+	def __init__(self, use_datetime=False, use_builtin_types=False, artLatency=.0):
 		self._use_datetime = use_datetime
 		self._use_builtin_types = use_builtin_types
 		self._connection = (None, None)
 		self._extra_headers = []
 		self.connections = []
 		self.host = None
+		self.artLatency = artLatency
 
 	def make_connection(self, host):
+		time.sleep(self.artLatency) #artifical network delay
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) 
 		context.set_ciphers("ADH") #Anonymous Diffie Hellman, requires no certs
 		context.load_dh_params("DH.pem") #Precomputed DH primes
@@ -120,12 +122,13 @@ def RPC(func):
 
 
 class Peer:
-	def __init__(self, name, IP, port, peerLimit):
+	def __init__(self, name, IP, port, peerLimit, artLatency=.0):
 		self.name = name
 		self.IP = IP
 		self.port = port
 		self.address = IP+':'+str(port)
 		self.peerLimit = peerLimit
+		self.artLatency = artLatency
 		self.myString = strMake(self.name, self.address, self.peerLimit)
 		self.peerSet = set([self.myString]) # adding ourselves to peerSet. design choice. to avoid a lot of bookkeeping.
 		self.peerSetLock = threading.RLock()
@@ -181,7 +184,7 @@ class Peer:
 		if(url in self.connections):
 			return self.connections[url]
 		else:
-			self.connections[url] = xmlrpc.client.ServerProxy(url, transport = DHTransport())
+			self.connections[url] = xmlrpc.client.ServerProxy(url, transport = DHTransport(artLatency=self.artLatency))
 			return self.connections[url]
 
 	#######################

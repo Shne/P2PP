@@ -40,10 +40,11 @@ parser.add_argument('IP', type=str, help='IP Address to listen on')
 parser.add_argument('port', type=int, help='Port to listen on')
 parser.add_argument('name', type=str, help='My name')
 parser.add_argument('limit', type=str, help='My peer limit')
+parser.add_argument('-late', default=.0, type=float, help='Artifical Latency in RPC requests')
 
 args = parser.parse_args()
 
-thisPeer = Peer(args.name, args.IP, args.port, args.limit)
+thisPeer = Peer(args.name, args.IP, args.port, args.limit, args.late)
 thisPeer.addResource(args.name, args.name + ' is interactive peer')
 
 while True:
