@@ -30,11 +30,19 @@ import ssl
 
 import http.client
 
+import base64
+
+from hashcash import mint, check
+
 	#########################
 	# Classes for safer RPC #
 	#########################
 
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
+	def __init__(self, addr, requestHandler=SimpleXMLRPCRequestHandler, logRequests=True, allow_none=False, encoding=None, bind_and_activate=True, artLatency=.0):
+		super().__init__(addr, requestHandler, logRequests, allow_none, encoding, bind_and_activate)
+		self.artLatency = artLatency
+
 	def _dispatch(self, method, params):
 		func = None
 		try:
@@ -43,34 +51,39 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			print("Forbidden: " + method )
 			return None
 		try:
+			time.sleep(self.artLatency) #artifical network delay
 			return super(RPCThreading, self)._dispatch(method, params)
 		except:
 			traceback.print_exc()
 			raise
-		
+
 class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 	def __init__(self, use_datetime=False, use_builtin_types=False):
 		self._use_datetime = use_datetime
 		self._use_builtin_types = use_builtin_types
 		self._connection = (None, None)
 		self._extra_headers = []
-		self.connection = None
+		self.connections = []
 		self.host = None
+
+	def getDHCardinality(self):
+		return len(self.connections)
 
 	def make_connection(self, host):
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) 
 		context.set_ciphers("ADH") #Anonymous Diffie Hellman, requires no certs
 		context.load_dh_params("DH.pem") #Precomputed DH primes
 
-		context.check_hostname = False
-
-		if(not (self.host == host) or (self.connection is None) or self.connection._HTTPConnection__state != 'Idle'):
+		if not (self.host == host):
+			connections = []
 			self.host = host
-			self.connection = http.client.HTTPSConnection(host, context = context)
-			return self.connection
+		viables = [connection for connection in self.connections if connection._HTTPConnection__state == 'Idle']
+		if len(viables) == 0:
+			connection = http.client.HTTPSConnection(host, context = context)
+			self.connections.append(connection)
+			return connection
 		else:
-			return self.connection
-		
+			return viables[0]
 
 	###########
 	# Helpers #
@@ -92,8 +105,6 @@ def strName(string):
 
 def strMake(name, address, limit):
 	return name+'@'+address+'|'+limit
-
-
 
 def hash(data):
 	h = SHA256.new()
@@ -118,15 +129,18 @@ def RPC(func):
 
 
 class Peer:
-	def __init__(self, name, IP, port, peerLimit):
+	def __init__(self, name, IP, port, peerLimit, artLatency=.0):
 		self.name = name
 		self.IP = IP
 		self.port = port
 		self.address = IP+':'+str(port)
 		self.peerLimit = peerLimit
+		self.artLatency = artLatency
 		self.myString = strMake(self.name, self.address, self.peerLimit)
 		self.peerSet = set([self.myString]) # adding ourselves to peerSet. design choice. to avoid a lot of bookkeeping.
 		self.peerSetLock = threading.RLock()
+
+		self.addNeighbourCounter = 0
 
 		self.neighbourSet = set([])
 		self.neighbourSemaphore = threading.Semaphore(int(peerLimit))
@@ -171,12 +185,11 @@ class Peer:
 
 	def makeProxy(self, IPPort):
 		url = "https://"+IPPort
-		#return xmlrpc.client.ServerProxy(url, transport = DHTransport())
 
 		if(url in self.connections):
 			return self.connections[url]
 		else:
-			self.connections[url] = xmlrpc.client.ServerProxy(url, transport = DHTransport())
+			self.connections[url] = xmlrpc.client.ServerProxy(url, transport=DHTransport())
 			return self.connections[url]
 
 	#######################
@@ -275,13 +288,11 @@ class Peer:
 	#######################
 
 	def startXMLRPCServer(self):
-		server = RPCThreading((self.IP, self.port), logRequests=False, allow_none=True)
+		server = RPCThreading((self.IP, self.port), logRequests=False, allow_none=True, artLatency=self.artLatency)
 
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) #See DHTransport
 		context.set_ciphers("ADH")
 		context.load_dh_params("DH.pem")
-
-		context.check_hostname = False
 
 		server.socket = context.wrap_socket(server.socket, server_side=True)
 		server.register_introspection_functions()
@@ -339,12 +350,10 @@ class Peer:
 		potentials = [peer for peer in self.peerSet if (not peer in self.neighbourSet) and (not strName(peer) == self.name)]
 		if(len(potentials) != 0):
 			neighbour = random.choice(potentials)
+			proof = mint(self.address.replace(':', '?'), bits = 12)
 			try:
-				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit):
-					if neighbour not in self.neighbourSet:
-						with self.neighbourSetLock:
-							self.neighbourSet.update([neighbour])
-						return True
+				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit, proof):
+					return self.addNeighbour(neighbour)
 			except ConnectionError as err:
 				print (self.name+': ConnectionError when becoming neighbour with ' + neighbour + '. is dead.')
 				self.evictPeers([neighbour])
@@ -356,7 +365,13 @@ class Peer:
 	#Based on pseudo-code from Week2 slides about GIA.
 
 	@RPC
-	def requestAddNeighbour(self, name, address, limit):
+	def requestAddNeighbour(self, name, address, limit, proof):
+
+		if not check(proof, address.replace(':', '?'), bits = 12):
+			print("Invalid proof of work")
+			print(proof)
+			return False
+
 		Y = strMake(name, address, limit)
 		if(self.neighbourSemaphore.acquire(False)):
 			# we have room for another neighbour
@@ -421,6 +436,7 @@ class Peer:
 		if neighbour not in self.neighbourSet:
 			with self.neighbourSetLock:
 				self.neighbourSet.update([neighbour])
+				self.addNeighbourCounter += 1
 			return True
 		else:
 			return False
@@ -557,7 +573,7 @@ class Peer:
 	@RPC
 	def handleWalkers(self, key, k, searchId, TTL, originalSourcePeer, sourcePeer):
 		#has the original source peer already found a result?
-		if TTL % 4 is 0: # only check each 4th step
+		if TTL % 4 == 0: # only check each 4th step
 			try:
 				self.messagesPassed += 1
 				if self.makeProxy(strAddress(originalSourcePeer)).hasKeyBeenFound(key):
@@ -579,14 +595,14 @@ class Peer:
 				return # no reason to continue search
 			
 		# should the walker die here?
-		if TTL is 0:
+		if TTL == 0:
 			return
 		
 		# calculate which neighbours are eligible to be sent this search (not having been sent the same search before from this this peer)
 		neighboursHavingSeenThisSearch = self.walkerSearchSentToNeighbours.get(searchId, [originalSourcePeer])
 		neighboursHavingSeenThisSearch.append(sourcePeer)
 		eligibleNeighbours = [n for n in self.neighbourSet if n not in neighboursHavingSeenThisSearch]
-		if len(eligibleNeighbours) is 0:
+		if len(eligibleNeighbours) == 0:
 			return
 
 		neighboursSentThisSearch = []
@@ -659,6 +675,39 @@ class Peer:
 		for p in self.peerSet:
 			self.makeProxy(strAddress(p)).resetMessagesCounter()
 
+
+	@RPC
+	def getAddNeighbourCounter(self):
+		return self.addNeighbourCounter
+
+	@RPC
+	def getAllAddNeighbourCounter(self):
+		with self.peerSetLock:
+			return sum([self.makeProxy(strAddress(p)).getAddNeighbourCounter() for p in self.peerSet])
+
+	@RPC
+	def resetAddNeighbourCounter(self):
+		self.addNeighbourCounter = 0
+
+	@RPC
+	def resetAllAddNeighbourCounter(self):
+		for p in self.peerSet:
+			self.makeProxy(strAddress(p)).resetAddNeighbourCounter()
+
+
+	@RPC
+	def getAvgDHCardinality(self):
+		l = [conn('transport').getDHCardinality() for conn in self.connections.values()]
+		return float(sum(l)/len(l))
+
+	@RPC
+	def getAllAvgDHCardinality(self):
+		with self.peerSetLock:
+			l = [self.makeProxy(strAddress(p)).getAvgDHCardinality() for p in self.peerSet]
+		return float(sum(l)/len(l))
+
+
+
 	@RPC
 	def resetResourceMap(self):
 		self.resourceMap = dict()
@@ -673,11 +722,17 @@ class Peer:
 		self.resetMessagesCounter()
 		self.resetResourceMap()
 		self.searches = set([])
+		self.resetAddNeighbourCounter()
 
 	@RPC
 	def fullResetAll(self):
 		for p in self.peerSet:
 			self.makeProxy(strAddress(p)).fullReset()
+
+
+	#########
+	# TESTS #
+	#########
 
 	def testHitRate(self, k, TTL, samples):
 		self.resetResourceMap()
@@ -740,19 +795,55 @@ class Peer:
 	##############
 
 	#Add a friend with a simple name, and assign him the given public key
-	def addFriend(self, name, key):
+	def addFriend(self, name, keyFile):
 		try:
-			publickey = RSA.importKey(open(key, 'r+b').read())
+			key = open(keyFile, 'r+b').read()
+			publickey = RSA.importKey(key)
 			cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
 			signer = PKCS1_v1_5.new(publickey)
 			self.friends[name] = (cipher, signer)
 		except FileNotFoundError:
 			print("Error, public key not found")
 
-	#Set up your own private key
-	def setSecret(self, key):
+	def fetchFriend(self, name, keyHash):
+		self.expandingRingFind(keyHash)
+		key = self.get(keyHash)
+		if(key is None):
+			print("Unable to find friend")
+			return
+
+		#Better make sure things fit
+		digest = SHA256.new()
+		digest.update(key.encode('utf-8'))
+		newHash = base64.b64encode(digest.digest()).decode('utf-8')
+		if keyHash != newHash:
+			print("Hash mismatch, got: "+ newHash + " expected: " + keyHash)
+			return
+
+		publickey = RSA.importKey(key.encode('utf8'))
+		cipher = PKCS1_OAEP.new(publickey) #Note PKCS1_OAEP is better known as RSAES-OAEP, and is the 'safe' way to do encryption with RSA
+		signer = PKCS1_v1_5.new(publickey)
+		self.friends[name] = (cipher, signer)
+
+	def publishKey(self, keyFile):
 		try:
-			privateKey = RSA.importKey(open(key, 'r+b').read()) #Oh shit, this read 'private.pem', I was scared there
+			key = open(keyFile, 'r+b').read()
+			#Store the key in our own network
+			digest = SHA256.new()
+			digest.update(key)
+			keyHash = base64.b64encode(digest.digest()).decode('utf-8')
+			
+			self.addResource(keyHash, key.decode('utf-8'))
+			
+			print("key added as: " + keyHash)
+		except FileNotFoundError:
+			print("Error, public key not found")
+
+	#Set up your own private key
+	def setSecret(self, keyFile):
+		try:
+			key = open(keyFile, 'r+b').read()
+			privateKey = RSA.importKey(key) #Oh shit, this read 'private.pem', I was scared there
 			self.cipher = PKCS1_OAEP.new(privateKey)
 			self.signer = PKCS1_v1_5.new(privateKey)
 		except FileNotFoundError:
@@ -780,7 +871,11 @@ class Peer:
 
 		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
 		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
-		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig))
+
+		proof = mint(base64.b64encode(encryptedMessage).decode('utf-8'))
+
+		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig), proof)
+
 		if signature is None:
 			print("Message not received!")
 			return
@@ -789,10 +884,16 @@ class Peer:
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
 	@RPC
-	def receiveMessage(self, message, sig): #Note: message is an XMLRPC binary data wrapper
+	def receiveMessage(self, message, sig, proof): #Note: message is an XMLRPC binary data wrapper
 		mhash = hash(message.data)
 		if mhash in self.messagesSet:
 			return None
+
+		if not check(proof, base64.b64encode(message.data).decode('utf-8')):
+			print("Invalid proof of work")
+			print(proof)
+			return None
+
 		self.messagesSet.add(mhash)
 		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
@@ -806,7 +907,7 @@ class Peer:
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 
-		neighbourResults = self.pool.map(self.forwardMessage, [(peer, message, sig) for peer in self.neighbourSet])
+		neighbourResults = self.pool.map(self.forwardMessage, [(peer, message, sig, proof) for peer in self.neighbourSet])
 		for result in neighbourResults:
 			if result is not None:
 				return result
@@ -816,10 +917,10 @@ class Peer:
 
 	#Helper to forward a message
 	def forwardMessage(self, args):
-		(peer, message, sig) = args
+		(peer, message, sig, proof) = args
 		try:
 			peerProxy = self.makeProxy(strAddress(peer))
-			return peerProxy.receiveMessage(message, sig)
+			return peerProxy.receiveMessage(message, sig, proof)
 		except ConnectionError as err:
 			self.evictPeers([peer])
 			return None
@@ -851,13 +952,22 @@ class Peer:
 			print("Note: You are sending signature-free messages")
 		self.awaitingAcks[messageID] = (owndigest, signer)
 		print("Sending message:" + messageID)
+
+		proof = mint(base64.b64encode(encryptedMessage).decode('utf-8'))
+		
 		for i in range(k):
-			self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature))
+			self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature), proof)
 
 	@RPC
-	def kReceiveMessage(self, message, nonce, ttl, sig): #Note: message is an XMLRPC binary data wrapper
+	def kReceiveMessage(self, message, nonce, ttl, sig, proof): #Note: message is an XMLRPC binary data wrapper
 		if ttl < 0:
 			return None
+
+		if not check(proof, base64.b64encode(message.data).decode('utf-8')):
+			print("Invalid proof of work")
+			print(proof)
+			return None
+
 		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
@@ -872,15 +982,17 @@ class Peer:
 				self.kAck(xmlrpc.client.Binary(signature), 32) #TODO:do something smarter about k/ttl
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
-		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig))
+		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig, proof))
 		forwardThread.start()
 
-	def safeForwardKWalker(self, message, nonce, ttl, sig):
+	def safeForwardKWalker(self, message, nonce, ttl, sig, proof):
 		try:
 			peer = random.sample(self.neighbourSet, 1)[0]
-			self.makeProxy(strAddress(peer)).kReceiveMessage(message, nonce, ttl, sig)
-		except:
+			self.makeProxy(strAddress(peer)).kReceiveMessage(message, nonce, ttl, sig, proof)
+		except ConnectionError:
 			self.evictPeers([peer])
+		except:
+			return None
 
 	@RPC
 	def kAck(self, ack, ttl):
@@ -933,7 +1045,7 @@ class Peer:
 
 	def sendCoverTraffic(self):
 		while True:
-			if len(self.neighbourSet) is not 0:
+			if len(self.neighbourSet) != 0:
 				peer = random.sample(self.neighbourSet, 1)[0]
 				try:
 					self.makeProxy(strAddress(peer)).coverTraffic(getRandomString(random.randrange(1, 50)))

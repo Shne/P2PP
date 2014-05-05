@@ -26,8 +26,27 @@ Improvement: Work out something better for k/ttl for k-walker delivery #jhk: wha
 
 ~~encrypt all xml-rpc traffic. use Diffie-Hellman to exchange secret~~
 
-Improvement: Persist neighbour connections (DH is wicked expensive, use a cache dict) #roland
+~~Improvement: Persist neighbour connections (DH is wicked expensive, use a cache dict)~~ #roland 
+
+Improvement: Evict proxy cache for dead peers
 
 ~~Cover traffic (Just call a dummy xml function with some dummy data at random intervals)~~
 
-Key distribution (Already have a key-value store, just store the public key (it's already text) under the key of its hash (base64)), remember to check if the hash matches when retrieved
+~~Key distribution (Already have a key-value store, just store the public key (it's already text) under the key of its hash (base64)), remember to check if the hash matches when retrieved~~
+
+Prettyness: Move special classes to their own file
+
+Prettyness: Store ssl context
+
+Prettyness: Clean up kris' code
+
+
+~~Proof of work (Calculate partial hash collision on address)~~
+
+Look into group chat
+
+Testing: Create tests to measure stuff (~~Time to form network~~, time to send message, k-walker hit rate, ~~cardinality of DH pools~~)
+
+Improvement: Short delay before acking message
+
+Improvement: check for proof of work more places

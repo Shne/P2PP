@@ -1,0 +1,35 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Chawathe et~al.(2003)Chawathe, Ratnasamy, Breslau, Lanham, and
+  Shenker]{GIA}
+Yatin Chawathe, Sylvia Ratnasamy, Lee Breslau, Nick Lanham, and Scott Shenker.
+\newblock Making gnutella-like p2p systems scalable.
+\newblock In \emph{Proceedings of the 2003 Conference on Applications,
+  Technologies, Architectures, and Protocols for Computer Communications},
+  SIGCOMM '03, pages 407--418, New York, NY, USA, 2003. ACM.
+\newblock ISBN 1-58113-735-4.
+\newblock \doi{10.1145/863955.864000}.
+\newblock URL \url{http://doi.acm.org/10.1145/863955.864000}.
+
+\bibitem[Bellare and Rogaway(1995)]{OAEP}
+Mihir Bellare and Phillip Rogaway.
+\newblock Optimal asymmetric encryption.
+\newblock In Alfredo Santis, editor, \emph{Advances in Cryptology - EUROCRYPT
+  94}, volume 950 of \emph{Lecture Notes in Computer Science}, pages 92--111.
+  Springer Berlin Heidelberg, 1995.
+\newblock ISBN 978-3-540-60176-0.
+\newblock \doi{10.1007/BFb0053428}.
+\newblock URL \url{http://dx.doi.org/10.1007/BFb0053428}.
+
+\bibitem[Diffie and Hellman(1976)]{DH}
+Whitfield Diffie and Martin~E Hellman.
+\newblock New directions in cryptography.
+\newblock \emph{Information Theory, IEEE Transactions on}, 22\penalty0
+  (6):\penalty0 644--654, 1976.
+
+\end{thebibliography}

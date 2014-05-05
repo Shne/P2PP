@@ -13,12 +13,19 @@ Signing messages
 Encrypting peers
 Cover Traffic - By way of SSL, note, small data, small messages
 Closing RPC calls
+Connection Pooling
+Key distribution, use our own network
 
 Known Vulnerabilites:
 MitM due to ADH
 Traffick analysis if entire network can be monitored
 Python xmlrpc-client is vulnerable to malformed xml
+DOS on key storage
+Key hash collision
+Spam from other sources than messages
 
 
 
 Tarzan, GIA, Freenet, TeleHash, BitMessage, Pycrypto, Openssl
+
+Count number of DH connection

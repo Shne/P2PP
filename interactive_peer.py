@@ -40,10 +40,11 @@ parser.add_argument('IP', type=str, help='IP Address to listen on')
 parser.add_argument('port', type=int, help='Port to listen on')
 parser.add_argument('name', type=str, help='My name')
 parser.add_argument('limit', type=str, help='My peer limit')
+parser.add_argument('-late', default=.0, type=float, help='Artifical Latency in RPC requests')
 
 args = parser.parse_args()
 
-thisPeer = Peer(args.name, args.IP, args.port, args.limit)
+thisPeer = Peer(args.name, args.IP, args.port, args.limit, args.late)
 thisPeer.addResource(args.name, args.name + ' is interactive peer')
 
 while True:
@@ -69,7 +70,7 @@ while True:
 		thisPeer.sayHello(match.group(1))
 		thisPeer.multicast()
 		thisPeer.startListeningForMulticast()
-		thispeer.startFindingNeighbours()
+		thisPeer.startFindingNeighbours()
 		thisPeer.startLookingForDeadNeighbours()
 		thisPeer.startSendingCoverTraffic()
 		continue
@@ -164,6 +165,39 @@ while True:
 		thisPeer.resetAllMessagesCounter()
 		continue
 
+	match = re.match(r"nadded$", do)
+	if match:
+		print('# of neighbours added by '+thisPeer.name+': '+str(thisPeer.getAddNeighbourCounter()))
+		continue
+
+	match = re.match(r"nadded-all", do)
+	if match:
+		print('# of neighbours added by all peers in network: '+str(thisPeer.getAllAddNeighbourCounter()))
+		continue
+
+	match = re.match(r"^naddedreset$", do)
+	if match:
+		thisPeer.resetAddNeighbourCounter()
+		continue
+
+	match = re.match(r"^naddedreset-all$", do)
+	if match:
+		thisPeer.resetAllAddNeighbourCounter()
+		continue
+
+
+	match = re.match(r"dhcard$", do)
+	if match:
+		print('Average Diffie-Hellman connection pool cardinality for '+thisPeer.name+': '+str(thisPeer.getAvgDHCardinality()))
+		continue
+
+	match = re.match(r"dhcard-all$", do)
+	if match:
+		print('Average Diffie-Hellman connection pool cardinality in this network: '+str(thisPeer.getAllAvgDHCardinality()))
+		continue
+
+
+
 	match = re.match(r"^fullreset$", do)
 	if match:
 		thisPeer.fullReset()
@@ -238,6 +272,16 @@ while True:
 	match = re.match(r"secret (.+)$", do)
 	if match:
 		thisPeer.setSecret(match.group(1))
+		continue
+
+	match = re.match(r"publish (.+)$", do)
+	if match:
+		thisPeer.publishKey(match.group(1))
+		continue
+
+	match = re.match(r"fetch-friend ([a-zA-Z0-9]+) (.+)$", do)
+	if match:
+		thisPeer.fetchFriend(match.group(1), match.group(2))
 		continue
 
 	# DEFAULT

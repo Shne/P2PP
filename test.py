@@ -4,14 +4,17 @@
 #	sudo pip3 install pexpect
 import time
 import pexpect
+import re
 
 timeout = 90
 msg = 'plplplplplp'
 try:
 	start = time.time()
-	setup = pexpect.spawn('./setup.py', timeout=90)
+	setup = pexpect.spawn('./setup.py -peers 10', timeout=30)
 	setup.expect('>')
+	end = time.time()
 	print('setup.py done')
+	print('time: '+str(end-start))
 	peer1 = pexpect.spawn('./interactive_peer.py localhost 8500 peer1 5', timeout=timeout)
 	peer2 = pexpect.spawn('./interactive_peer.py localhost 8501 peer2 5', timeout=timeout)
 
@@ -38,20 +41,28 @@ try:
 	peer2.sendline('friend peer1 public.pem')
 	peer2.expect('>')
 
-	#send message via flooding
-	# peer1.sendline('message peer2 '+msg)
-	# peer2.expect('Received Message from peer1: '+msg+'\r\n')
-	# peer1.expect('peer2 received message! \(verified\)\r\n')
-	# print('Flooding message success!')
 
+	start = time.time()
+	#send message via flooding
+	peer1.sendline('message peer2 '+msg)
+	peer2.expect('Received Message from peer1: '+msg+'\r\n')
+	peer1.expect('peer2 received message! \(verified\)\r\n')
+	end = time.time()
+	print('Flooding message success!')
+	print('time: '+str(end-start))
+	peer1.sendline('mpassed-all')
+	peer1.expect('Messages passed by all peers in network: (\d+)\r\n')
+	mpassed = re.compile('\d+').search(str(peer1.after)).group()
+	print('total messages: '+mpassed)
+
+	start = time.time()
 	# send message via k walker
 	peer1.sendline('kmessage peer2 '+msg)
 	peer2.expect('Received Message from peer1: '+msg+'\r\n')
 	peer1.expect('Message delivered and acknowledged:.+\r\n')
-	print('KWalker message success!')
-
 	end = time.time()
-	print(end-start)
+	print('KWalker message success!')
+	print('time: '+str(end-start))
 
 except pexpect.TIMEOUT as err:
 	print('peer1.before: '+str(peer1.before))

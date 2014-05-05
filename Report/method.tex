@@ -1,0 +1,69 @@
+\section{Method of Operation}
+
+\subsection{Base System}
+
+The system described is built atop the unstructured network developed during the P2PN course (TODO: ref earlier P2PN report). This network contains very little structural information, and bases its topology on the GIA network~\citep{GIA}.
+
+The choice of this network was made based on its simplicity and extendibility, and due to the fact that unstructured networks require little information about the peers involved, making it difficult the track which peers are doing what. 
+
+Note that the techniques used to extend the network could be applied to most unstructured networks, and would probably work just as well on the GIA network.
+
+\subsection{Encrypting Messages and Hiding Recipients}
+
+In order to ensure that no adversaries can read the content of any given message, we encrypt chat messages travelling across the network using RSA-OAEP~\citep{OAEP}. RSA-OAEP was chosen due to its ease of use, and security against repeated plaintext attacks.
+
+When performing this encryption, we use a pair of RSA (TODO:Mayby reference?) keys. The sender must obtain the public key of the final recipient (how to do this will be explained later), in order to encrypt the message.
+
+When the chat message is sent, it is first encrypted by RSA-OAEP using the public key of the recipient, and then broadcast across the network using either flooding or k-walkers. Whenever a peer receives a messages travelling across the network, it will attempt to decrypt it using the corresponding RSA-OAEP decrypting using its own private key. This will fail for all peers except the recipient, ensuring that only the final recipient will be able to obtain the contents of the chat message.
+
+Note that the encrypted message sent across the network contains no delivery address of any kind, and as such no other peers will know the final recipient.
+
+It is also worth noting that only one RSA key pair is required to send messages. The sender needs no private key, nor do any other peers in the network except the receiver.
+
+\subsection{Signed Messages and Acknowledgement}
+
+All chat messages in the system may or may not be signed by the sender. If the sender wishes to not sign his messages, in order to hide their identity to the receiver, or because he is not in possession of a private key, he may omit this signature. Additionally, any message received by a peer can be acknowledged by returning a signed digest of the message.
+
+Both types of signatures are done according to \textbf{PKCS\#1 v1.5} (TODO:Some sort of reference).
+
+In the case of the sender signing a message, we send a signature of the plain-text message along with encrypted message. This ensures, that only after obtaining the decrypted message will it be possible to verify the signature. This ensures that we keep identity of the sender hidden to anyone except the recipient, and that the recipient can securely verify the sender given his public key. Also, should anyone attempt to tamper with the message before delivery, the signature will no longer be valid.
+
+When verifying the delivery of a message the receiver returns a signed digest of the plaintext message, which is verified by the sender. This ensures that the sender has received the message, as he is the only one able to provide a valid signature. If the peer is using flooding we simply return this value as part of the xml-rpc call, while we answer back using a k-walker in the case that we receive a message by k-walker. Given a small random delay, it become difficult to determine whether a message was received by any given peer, or one of his neighbours. Also, should anyone tamper with the message before delivery, the receiver will no longer sign the correct data, making this easily detectable for the sender.
+
+\subsection{Encrypting Peer Communication}
+
+All traffic between peers in the network is encrypted using anonymous Diffie-Hellman~\citep{DH} encryption. This encryption is provided by wrapping connections between peers in an SSL layer, with no certificates and anonymous Diffie-Hellman as the only cipher set.
+
+This ensures that peers can communicate without outside parties snooping on the information, therefore, will make it very hard to track messages across the network, since the data sent from messages, cover traffic, and general networks operations will be indistinguishable.
+
+Another reason to use anonymous Diffie-Hellman encryption is that it enforces no requirements on previously distributed keys or identities of the peers, keeping each peer's knowledge about its neighbours at a minimum.
+
+In order to prevent constant Diffie-Hellman key renegotiations we provide cached pools of SSL connections, meaning that we only create a new connection when the peer runs out of idle connections to the same peer.
+
+\subsection{Cover Traffic}
+
+Preventing traffic analysis by way of providing cover traffic is an important part of the network. The network relies heavily on the SSL encryption of the peer-to-peer connections to keep traffic types indistinguishable, making it very difficult for an outside observer to discern what data traffic belongs to messages and which concern the network.
+
+In terms of cover traffic, we provide two sources of cover.
+
+One is the general operations of the network. Neighbours will constantly contact each other to ensure that they are alive, and any peers leaving or joining the network will require a fair bit of communication between peers. Since all of this traffic is encrypted, it will hard to distinguish this communication from messages.
+
+The second source of cover traffic is explicit cover traffic. Peers will at random intervals send random data of random lengths between each other. This data ensures unpredictable network traffic, and hinders traffic analysis even further.
+
+\subsection{Public Key Distribution}
+
+When a peer wishes to communicate chat messages to another peer, it is required to know the public key of the recipient.
+
+This public key can be supplied directly by the sender, indicating that the key has been distributed securely outside of the network. In this case, the key is simply loaded from a provided file.
+
+The network also offers the option of publishing public keys using the underlying peer-to-peer networks ability to share resources. When doing this, the public key is read, and stored in the network as a resource using the base64 encoding of its SHA-256 hash as its name. The key can then either be fetched and stored normally as a resource by other peers, or loaded directly into the public storage of other peers.
+
+Any peer that loads the key directly will verify its hash as it does so.
+
+The result is a tag 44 characters long, that can be shared much easier than an entire public key.
+
+\subsection{Limiting RPC Call Availability}
+
+Standard practice in object-oriented Python-based RPC servers is to register the entire object for RPC call availability. This is highly inadvisable if one wishes to protect the network from malicious peers.
+
+In order to prevent this form of attack, we enforce strict limitations of function availability. This is done by extending the way the RPC calls are handled by the XML-RPC components, and tagging only the needed methods calls as being callable by RPC. Any attempt to call an unlisted function will silently be ignored.
