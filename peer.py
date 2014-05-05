@@ -130,6 +130,9 @@ class Peer:
 		self.peerSet = set([self.myString]) # adding ourselves to peerSet. design choice. to avoid a lot of bookkeeping.
 		self.peerSetLock = threading.RLock()
 
+		self.addNeighbourCounter = 0
+		self.addNeighbourCounterLock = threading.RLock()
+
 		self.neighbourSet = set([])
 		self.neighbourSemaphore = threading.Semaphore(int(peerLimit))
 		self.neighbourSetLock = threading.RLock()
@@ -341,10 +344,7 @@ class Peer:
 			neighbour = random.choice(potentials)
 			try:
 				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit):
-					if neighbour not in self.neighbourSet:
-						with self.neighbourSetLock:
-							self.neighbourSet.update([neighbour])
-						return True
+					self.addNeighbour(neighbour)
 			except ConnectionError as err:
 				print (self.name+': ConnectionError when becoming neighbour with ' + neighbour + '. is dead.')
 				self.evictPeers([neighbour])
@@ -421,6 +421,8 @@ class Peer:
 		if neighbour not in self.neighbourSet:
 			with self.neighbourSetLock:
 				self.neighbourSet.update([neighbour])
+			with self.addNeighbourCounterLock:
+				self.addNeighbourCounter += 1
 			return True
 		else:
 			return False
@@ -659,6 +661,25 @@ class Peer:
 		for p in self.peerSet:
 			self.makeProxy(strAddress(p)).resetMessagesCounter()
 
+
+	@RPC
+	def getAddNeighbourCounter(self):
+		return self.addNeighbourCounter
+
+	@RPC
+	def getAllAddNeighbourCounter(self):
+		return sum([self.makeProxy(strAddress(p)).getAddNeighbourCounter() for p in self.peerSet])
+
+	@RPC
+	def resetAddNeighbourCounter(self):
+		self.addNeighbourCounter = 0
+
+	@RPC
+	def resetAllAddNeighbourCounter(self):
+		for p in self.peerSet:
+			self.makeProxy(strAddress(p)).resetAddNeighbourCounter()
+
+
 	@RPC
 	def resetResourceMap(self):
 		self.resourceMap = dict()
@@ -673,11 +694,17 @@ class Peer:
 		self.resetMessagesCounter()
 		self.resetResourceMap()
 		self.searches = set([])
+		self.resetAddNeighbourCounter()
 
 	@RPC
 	def fullResetAll(self):
 		for p in self.peerSet:
 			self.makeProxy(strAddress(p)).fullReset()
+
+
+	#########
+	# TESTS #
+	#########
 
 	def testHitRate(self, k, TTL, samples):
 		self.resetResourceMap()
