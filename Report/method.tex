@@ -39,3 +39,31 @@ This ensures that peers can communicate without outside parties snooping on the 
 Another reason to use anonymous Diffie-Hellman encryption is that it enforces no requirements on previously distributed keys or identities of the peers, keeping each peer's knowledge about its neighbours at a minimum.
 
 In order to prevent constant Diffie-Hellman key renegotiations we provide cached pools of SSL connections, meaning that we only create a new connection when the peer runs out of idle connections to the same peer.
+
+\subsection{Cover Traffic}
+
+Preventing traffic analysis by way of providing cover traffic is an important part of the network. The network relies heavily on the SSL encryption of the peer-to-peer connections to keep traffic types indistinguishable, making it very difficult for an outside observer to discern what data traffic belongs to messages and which concern the network.
+
+In terms of cover traffic, we provide two sources of cover.
+
+One is the general operations of the network. Neighbours will constantly contact each other to ensure that they are alive, and any peers leaving or joining the network will require a fair bit of communication between peers. Since all of this traffic is encrypted, it will hard to distinguish this communication from messages.
+
+The second source of cover traffic is explicit cover traffic. Peers will at random intervals send random data of random lengths between each other. This data ensures unpredictable network traffic, and hinders traffic analysis even further.
+
+\subsection{Public Key Distribution}
+
+When a peer wishes to communicate chat messages to another peer, it is required to know the public key of the recipient.
+
+This public key can be supplied directly by the sender, indicating that the key has been distributed securely outside of the network. In this case, the key is simply loaded from a provided file.
+
+The network also offers the option of publishing public keys using the underlying peer-to-peer networks ability to share resources. When doing this, the public key is read, and stored in the network as a resource using the base64 encoding of its SHA-256 hash as its name. The key can then either be fetched and stored normally as a resource by other peers, or loaded directly into the public storage of other peers.
+
+Any peer that loads the key directly will verify its hash as it does so.
+
+The result is a tag 44 characters long, that can be shared much easier than an entire public key.
+
+\subsection{Limiting RPC Call Availability}
+
+Standard practice in object-oriented Python-based RPC servers is to register the entire object for RPC call availability. This is highly inadvisable if one wishes to protect the network from malicious peers.
+
+In order to prevent this form of attack, we enforce strict limitations of function availability. This is done by extending the way the RPC calls are handled by the XML-RPC components, and tagging only the needed methods calls as being callable by RPC. Any attempt to call an unlisted function will silently be ignored.

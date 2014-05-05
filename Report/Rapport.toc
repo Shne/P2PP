@@ -4,3 +4,5 @@
 \contentsline {subsection}{\numberline {2.2}Encrypting Messages and Hiding Recipients}{3}{subsection.2.2}
 \contentsline {subsection}{\numberline {2.3}Signed Messages and Acknowledgement}{4}{subsection.2.3}
 \contentsline {subsection}{\numberline {2.4}Encrypting Peer Communication}{4}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}Cover Traffic}{5}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}Limiting RPC Call Availability}{5}{subsection.2.6}
