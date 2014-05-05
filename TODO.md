@@ -28,7 +28,7 @@ Improvement: Work out something better for k/ttl for k-walker delivery #jhk: wha
 
 ~~Improvement: Persist neighbour connections (DH is wicked expensive, use a cache dict)~~ #roland 
 
-Improvement: Evict proxy cache for dead peers
+Improvement: Evict proxy cache for dead peers #Roland
 
 ~~Cover traffic (Just call a dummy xml function with some dummy data at random intervals)~~
 
