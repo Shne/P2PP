@@ -24,7 +24,8 @@ try:
 		peer.sendline('nadded-all')
 		peer.expect('# of neighbours added by all peers in network: \d+\r\n')
 		nadded = re.compile('\d+').search(str(peer.after)).group()
-		print(str(time.time()) + ' ' + nadded)
+		totalTime = '{:.2f}'.format(time.time())
+		print(totalTime + ' ' + nadded)
 
 	
 
