@@ -186,6 +186,18 @@ while True:
 		continue
 
 
+	match = re.match(r"dhcard$", do)
+	if match:
+		print('Average Diffie-Hellman connection pool cardinality for '+thisPeer.name+': '+str(thisPeer.getAvgDHCardinality()))
+		continue
+
+	match = re.match(r"dhcard-all", do)
+	if match:
+		print('Average Diffie-Hellman connection pool cardinality in this network: '+str(thisPeer.getAllAvgDHCardinality()))
+		continue
+
+
+
 	match = re.match(r"^fullreset$", do)
 	if match:
 		thisPeer.fullReset()

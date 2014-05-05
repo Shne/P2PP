@@ -60,6 +60,9 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 		self.host = None
 		self.artLatency = artLatency
 
+	def getDHCardinality(self):
+		return len(self.connections)
+
 	def make_connection(self, host):
 		time.sleep(self.artLatency) #artifical network delay
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) 
@@ -76,7 +79,6 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 			return connection
 		else:
 			return viables[0]
-		
 
 	###########
 	# Helpers #
@@ -178,12 +180,11 @@ class Peer:
 
 	def makeProxy(self, IPPort):
 		url = "https://"+IPPort
-		#return xmlrpc.client.ServerProxy(url, transport = DHTransport())
 
 		if(url in self.connections):
 			return self.connections[url]
 		else:
-			self.connections[url] = xmlrpc.client.ServerProxy(url, transport = DHTransport(artLatency=self.artLatency))
+			self.connections[url] = xmlrpc.client.ServerProxy(url, transport=DHTransport(artLatency=self.artLatency))
 			return self.connections[url]
 
 	#######################
@@ -680,6 +681,18 @@ class Peer:
 	def resetAllAddNeighbourCounter(self):
 		for p in self.peerSet:
 			self.makeProxy(strAddress(p)).resetAddNeighbourCounter()
+
+
+	@RPC
+	def getAvgDHCardinality(self):
+		l = [conn('transport').getDHCardinality() for conn in self.connections.values()]
+		return float(sum(l)/len(l))
+
+	@RPC
+	def getAllAvgDHCardinality(self):
+		l = [self.makeProxy(strAddress(p)).getAvgDHCardinality() for p in self.peerSet]
+		return float(sum(l)/len(l))
+
 
 
 	@RPC
