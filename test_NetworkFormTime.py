@@ -9,7 +9,8 @@ import re
 timeout = 90
 msg = 'plplplplplp'
 try:
-	setup = pexpect.spawn('./setup.py -peers 40 -late 0.2', timeout=30)
+	print('start: {:.2f}'.format(time.time()))
+	setup = pexpect.spawn('./setup.py -peers 80 -late 0.2', timeout=30)
 	setup.expect('>')
 	peer = pexpect.spawn('./interactive_peer.py localhost 8500 peer1 5', timeout=timeout)
 
@@ -17,8 +18,6 @@ try:
 	peer.expect('>')
 	peer.sendline('hello')
 	peer.expect('>')
-
-	start = time.time()
 
 	while True:
 		peer.sendline('nadded-all')
