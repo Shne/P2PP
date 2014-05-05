@@ -10,7 +10,7 @@ timeout = 90
 msg = 'plplplplplp'
 try:
 	print('start: {:.2f}'.format(time.time()))
-	setup = pexpect.spawn('./setup.py -peers 40', timeout=30)
+	setup = pexpect.spawn('./setup.py -peers 80 -late 0.1', timeout=30)
 	setup.expect('>')
 	peer = pexpect.spawn('./interactive_peer.py localhost 8500 peer1 5', timeout=timeout)
 
@@ -19,7 +19,6 @@ try:
 	peer.sendline('hello')
 	peer.expect('>')
 
-	time.sleep(1)
 	while True:
 		peer.sendline('dhcard-all')
 		peer.expect('Average Diffie-Hellman connection pool cardinality in this network: \d+.\d+\r\n')

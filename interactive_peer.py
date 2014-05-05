@@ -70,7 +70,7 @@ while True:
 		thisPeer.sayHello(match.group(1))
 		thisPeer.multicast()
 		thisPeer.startListeningForMulticast()
-		thispeer.startFindingNeighbours()
+		thisPeer.startFindingNeighbours()
 		thisPeer.startLookingForDeadNeighbours()
 		thisPeer.startSendingCoverTraffic()
 		continue

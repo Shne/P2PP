@@ -37,6 +37,10 @@ import base64
 	#########################
 
 class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no idea what this does, except work
+	def __init__(self, addr, requestHandler=SimpleXMLRPCRequestHandler, logRequests=True, allow_none=False, encoding=None, bind_and_activate=True, artLatency=.0):
+		super().__init__(addr, requestHandler, logRequests, allow_none, encoding, bind_and_activate)
+		self.artLatency = artLatency
+
 	def _dispatch(self, method, params):
 		func = None
 		try:
@@ -45,26 +49,25 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			print("Forbidden: " + method )
 			return None
 		try:
+			time.sleep(self.artLatency) #artifical network delay
 			return super(RPCThreading, self)._dispatch(method, params)
 		except:
 			traceback.print_exc()
 			raise
 
 class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
-	def __init__(self, use_datetime=False, use_builtin_types=False, artLatency=.0):
+	def __init__(self, use_datetime=False, use_builtin_types=False):
 		self._use_datetime = use_datetime
 		self._use_builtin_types = use_builtin_types
 		self._connection = (None, None)
 		self._extra_headers = []
 		self.connections = []
 		self.host = None
-		self.artLatency = artLatency
 
 	def getDHCardinality(self):
 		return len(self.connections)
 
 	def make_connection(self, host):
-		time.sleep(self.artLatency) #artifical network delay
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) 
 		context.set_ciphers("ADH") #Anonymous Diffie Hellman, requires no certs
 		context.load_dh_params("DH.pem") #Precomputed DH primes
@@ -184,7 +187,7 @@ class Peer:
 		if(url in self.connections):
 			return self.connections[url]
 		else:
-			self.connections[url] = xmlrpc.client.ServerProxy(url, transport=DHTransport(artLatency=self.artLatency))
+			self.connections[url] = xmlrpc.client.ServerProxy(url, transport=DHTransport())
 			return self.connections[url]
 
 	#######################
@@ -283,7 +286,7 @@ class Peer:
 	#######################
 
 	def startXMLRPCServer(self):
-		server = RPCThreading((self.IP, self.port), logRequests=False, allow_none=True)
+		server = RPCThreading((self.IP, self.port), logRequests=False, allow_none=True, artLatency=self.artLatency)
 
 		context = ssl.SSLContext(ssl.PROTOCOL_SSLv23) #See DHTransport
 		context.set_ciphers("ADH")
@@ -690,7 +693,8 @@ class Peer:
 
 	@RPC
 	def getAllAvgDHCardinality(self):
-		l = [self.makeProxy(strAddress(p)).getAvgDHCardinality() for p in self.peerSet]
+		with self.peerSetLock:
+			l = [self.makeProxy(strAddress(p)).getAvgDHCardinality() for p in self.peerSet]
 		return float(sum(l)/len(l))
 
 
