@@ -10,7 +10,7 @@ Note that the techniques used to extend the network could be applied to most uns
 
 \subsection{Encrypting Messages and Hiding Recipients}
 
-In order to ensure that no adversaries can divulge the content of any given message, we encrypt chat messages travelling across the network using RSA-OAEP~\citep{OAEP}. RSA-OAEP was chosen due to its ease of use, and security against repeated plaintext attacks.
+In order to ensure that no adversaries can read the content of any given message, we encrypt chat messages travelling across the network using RSA-OAEP~\citep{OAEP}. RSA-OAEP was chosen due to its ease of use, and security against repeated plaintext attacks.
 
 When performing this encryption, we use a pair of RSA (TODO:Mayby reference?) keys. The sender must obtain the public key of the final recipient (how to do this will be explained later), in order to encrypt the message.
 
@@ -18,7 +18,7 @@ When the chat message is sent, it is first encrypted by RSA-OAEP using the publi
 
 Note that the encrypted message sent across the network contains no delivery address of any kind, and as such no other peers will know the final recipient.
 
-It is also worth noting that only one RSA key pair is required to send messages. The sender needs no private key, nor do any other peers in the network.
+It is also worth noting that only one RSA key pair is required to send messages. The sender needs no private key, nor do any other peers in the network except the receiver.
 
 \subsection{Signed Messages and Acknowledgement}
 
