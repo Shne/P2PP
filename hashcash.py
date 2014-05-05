@@ -51,7 +51,7 @@ ERR = sys.stderr            # Destination for error messages
 DAYS = 60 * 60 * 24         # Seconds in a day
 tries = [0]                 # Count hashes performed for benchmark
 
-def mint(resource, bits=20, now=None, ext='', saltchars=8, stamp_seconds=True):
+def mint(resource, bits=16, now=None, ext='', saltchars=8, stamp_seconds=True):
     """Mint a new hashcash stamp for 'resource' with 'bits' of collision
 
     20 bits of collision is the default.
@@ -101,8 +101,8 @@ def _mint(challenge, bits):
             return hex(counter)[2:]
         counter += 1
 
-def check(stamp, resource=None, bits=None,
-                 check_expiration=None, ds_callback=None):
+def check(stamp, resource=None, bits=16,
+                 check_expiration=120, ds_callback=None):
     """Check whether a stamp is valid
 
     Optionally, the stamp may be checked for a specific resource, and/or
@@ -119,7 +119,7 @@ def check(stamp, resource=None, bits=None,
     NOTE: Every valid (version 1) stamp must meet its claimed bit value
     NOTE: Check floor of 4-bit multiples (overly permissive in acceptance)
     """
-    if stamp.startswith('0:'):          # Version 0
+    if stamp.startswith('0:'):# Version 0          
         try:
             date, res, suffix = stamp[2:].split(':')
         except ValueError:
@@ -152,6 +152,8 @@ def check(stamp, resource=None, bits=None,
             good_until = strftime("%y%m%d%H%M%S", localtime(time()-check_expiration))
             if date < good_until:
                 return False
+            hex_digits = int(floor(int(claim)/4))
+            return sha(stamp).startswith('0'*hex_digits)
         elif isinstance(ds_callback, collections.Callable) and ds_callback(stamp):
             return False
         else:

@@ -22,6 +22,7 @@ Traffick analysis if entire network can be monitored
 Python xmlrpc-client is vulnerable to malformed xml
 DOS on key storage
 Key hash collision
+Spam from other sources than messages
 
 
 

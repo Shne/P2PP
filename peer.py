@@ -32,6 +32,8 @@ import http.client
 
 import base64
 
+from hashcash import mint, check
+
 	#########################
 	# Classes for safer RPC #
 	#########################
@@ -348,8 +350,9 @@ class Peer:
 		potentials = [peer for peer in self.peerSet if (not peer in self.neighbourSet) and (not strName(peer) == self.name)]
 		if(len(potentials) != 0):
 			neighbour = random.choice(potentials)
+			proof = mint(self.address.replace(':', '?'), bits = 12)
 			try:
-				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit):
+				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit, proof):
 					return self.addNeighbour(neighbour)
 			except ConnectionError as err:
 				print (self.name+': ConnectionError when becoming neighbour with ' + neighbour + '. is dead.')
@@ -362,7 +365,13 @@ class Peer:
 	#Based on pseudo-code from Week2 slides about GIA.
 
 	@RPC
-	def requestAddNeighbour(self, name, address, limit):
+	def requestAddNeighbour(self, name, address, limit, proof):
+
+		if not check(proof, address.replace(':', '?'), bits = 12):
+			print("Invalid proof of work")
+			print(proof)
+			return False
+
 		Y = strMake(name, address, limit)
 		if(self.neighbourSemaphore.acquire(False)):
 			# we have room for another neighbour
@@ -862,7 +871,11 @@ class Peer:
 
 		encryptedMessage = cipher.encrypt(message.encode('utf-8'))
 		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
-		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig))
+
+		proof = mint(base64.b64encode(encryptedMessage).decode('utf-8'))
+
+		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig), proof)
+
 		if signature is None:
 			print("Message not received!")
 			return
@@ -871,10 +884,16 @@ class Peer:
 
 	#Recieve message, check if it's for us, try to decode it and pass it on
 	@RPC
-	def receiveMessage(self, message, sig): #Note: message is an XMLRPC binary data wrapper
+	def receiveMessage(self, message, sig, proof): #Note: message is an XMLRPC binary data wrapper
 		mhash = hash(message.data)
 		if mhash in self.messagesSet:
 			return None
+
+		if not check(proof, base64.b64encode(message.data).decode('utf-8')):
+			print("Invalid proof of work")
+			print(proof)
+			return None
+
 		self.messagesSet.add(mhash)
 		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
@@ -888,7 +907,7 @@ class Peer:
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 
-		neighbourResults = self.pool.map(self.forwardMessage, [(peer, message, sig) for peer in self.neighbourSet])
+		neighbourResults = self.pool.map(self.forwardMessage, [(peer, message, sig, proof) for peer in self.neighbourSet])
 		for result in neighbourResults:
 			if result is not None:
 				return result
@@ -898,10 +917,10 @@ class Peer:
 
 	#Helper to forward a message
 	def forwardMessage(self, args):
-		(peer, message, sig) = args
+		(peer, message, sig, proof) = args
 		try:
 			peerProxy = self.makeProxy(strAddress(peer))
-			return peerProxy.receiveMessage(message, sig)
+			return peerProxy.receiveMessage(message, sig, proof)
 		except ConnectionError as err:
 			self.evictPeers([peer])
 			return None
@@ -933,13 +952,22 @@ class Peer:
 			print("Note: You are sending signature-free messages")
 		self.awaitingAcks[messageID] = (owndigest, signer)
 		print("Sending message:" + messageID)
+
+		proof = mint(base64.b64encode(encryptedMessage).decode('utf-8'))
+		
 		for i in range(k):
-			self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature))
+			self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature), proof)
 
 	@RPC
-	def kReceiveMessage(self, message, nonce, ttl, sig): #Note: message is an XMLRPC binary data wrapper
+	def kReceiveMessage(self, message, nonce, ttl, sig, proof): #Note: message is an XMLRPC binary data wrapper
 		if ttl < 0:
 			return None
+
+		if not check(proof, base64.b64encode(message.data).decode('utf-8')):
+			print("Invalid proof of work")
+			print(proof)
+			return None
+
 		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
@@ -954,15 +982,17 @@ class Peer:
 				self.kAck(xmlrpc.client.Binary(signature), 32) #TODO:do something smarter about k/ttl
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
-		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig))
+		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig, proof))
 		forwardThread.start()
 
-	def safeForwardKWalker(self, message, nonce, ttl, sig):
+	def safeForwardKWalker(self, message, nonce, ttl, sig, proof):
 		try:
 			peer = random.sample(self.neighbourSet, 1)[0]
-			self.makeProxy(strAddress(peer)).kReceiveMessage(message, nonce, ttl, sig)
-		except:
+			self.makeProxy(strAddress(peer)).kReceiveMessage(message, nonce, ttl, sig, proof)
+		except ConnectionError:
 			self.evictPeers([peer])
+		except:
+			return None
 
 	@RPC
 	def kAck(self, ack, ttl):
