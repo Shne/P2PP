@@ -134,7 +134,6 @@ class Peer:
 		self.peerSetLock = threading.RLock()
 
 		self.addNeighbourCounter = 0
-		self.addNeighbourCounterLock = threading.RLock()
 
 		self.neighbourSet = set([])
 		self.neighbourSemaphore = threading.Semaphore(int(peerLimit))
@@ -424,7 +423,6 @@ class Peer:
 		if neighbour not in self.neighbourSet:
 			with self.neighbourSetLock:
 				self.neighbourSet.update([neighbour])
-			with self.addNeighbourCounterLock:
 				self.addNeighbourCounter += 1
 			return True
 		else:
@@ -671,7 +669,8 @@ class Peer:
 
 	@RPC
 	def getAllAddNeighbourCounter(self):
-		return sum([self.makeProxy(strAddress(p)).getAddNeighbourCounter() for p in self.peerSet])
+		with self.peerSetLock:
+			return sum([self.makeProxy(strAddress(p)).getAddNeighbourCounter() for p in self.peerSet])
 
 	@RPC
 	def resetAddNeighbourCounter(self):

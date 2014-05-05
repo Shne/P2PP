@@ -165,22 +165,22 @@ while True:
 		thisPeer.resetAllMessagesCounter()
 		continue
 
-	match = re.match(r"addedn$", do)
+	match = re.match(r"nadded$", do)
 	if match:
 		print('# of neighbours added by '+thisPeer.name+': '+str(thisPeer.getAddNeighbourCounter()))
 		continue
 
-	match = re.match(r"addedn-all", do)
+	match = re.match(r"nadded-all", do)
 	if match:
 		print('# of neighbours added by all peers in network: '+str(thisPeer.getAllAddNeighbourCounter()))
 		continue
 
-	match = re.match(r"^addednreset$", do)
+	match = re.match(r"^naddedreset$", do)
 	if match:
 		thisPeer.resetAddNeighbourCounter()
 		continue
 
-	match = re.match(r"^addednreset-all$", do)
+	match = re.match(r"^naddedreset-all$", do)
 	if match:
 		thisPeer.resetAllAddNeighbourCounter()
 		continue
