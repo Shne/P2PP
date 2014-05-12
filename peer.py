@@ -57,7 +57,7 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			traceback.print_exc()
 			raise
 
-class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
+class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH, and pools connections
 	def __init__(self, use_datetime=False, use_builtin_types=False):
 		self._use_datetime = use_datetime
 		self._use_builtin_types = use_builtin_types
@@ -77,7 +77,7 @@ class DHTransport(xmlrpc.client.Transport): #xmlrpc-client transport support ADH
 		if not (self.host == host):
 			connections = []
 			self.host = host
-		viables = [connection for connection in self.connections if connection._HTTPConnection__state == 'Idle']
+		viables = [connection for connection in self.connections if connection._HTTPConnection__state == 'Idle'] #Python is so slutty
 		if len(viables) == 0:
 			connection = http.client.HTTPSConnection(host, context = context)
 			self.connections.append(connection)
@@ -861,7 +861,7 @@ class Peer:
 			print("Error, unknown friend")
 			return None
 
-		owndigest = SHA256.new()
+		owndigest = SHA256.new() #Prepare our own signature
 		owndigest.update(message.encode('utf-8'))
 		sig = None
 		try:
@@ -874,9 +874,9 @@ class Peer:
 
 		proof = mint(base64.b64encode(encryptedMessage).decode('utf-8'))
 
-		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig), proof)
+		signature = self.receiveMessage(wrappedEncryptedMessage, xmlrpc.client.Binary(sig), proof) 
 
-		if signature is None:
+		if signature is None:#Check receiver signature
 			print("Message not received!")
 			return
 		if signer.verify(owndigest, signature.data):
@@ -942,11 +942,11 @@ class Peer:
 			print("Error, unknown friend")
 			return None
 
-		(noncedMessage, nonce) = nonceMsg(message)
+		(noncedMessage, nonce) = nonceMsg(message) #Noncing makes hash collisions in the reply signature unlikely
 		encryptedMessage = cipher.encrypt(noncedMessage.encode('utf-8'))
 		wrappedEncryptedMessage = xmlrpc.client.Binary(encryptedMessage)
 
-		owndigest = SHA256.new()
+		owndigest = SHA256.new() #Prepare our own signature
 		owndigest.update(noncedMessage.encode('utf-8'))
 		signature = None
 		try:
@@ -1027,13 +1027,13 @@ class Peer:
 	def checkSender(self, decryptedMessage, signature):
 		digest = SHA256.new()
 		digest.update(decryptedMessage)
-		sender = "???" 
-		if signature is None:
+		sender = "???" #Default value
+		if signature is None: #Noone even signed this
 			return sender
 		for k, v in self.friends.items():
 			(cipher, signer) = v
 			if signer.verify(digest, signature.data):
-				sender = k
+				sender = k #The sender is verified
 			else:
 				pass
 		return sender
@@ -1044,7 +1044,7 @@ class Peer:
 
 	@RPC
 	def coverTraffic(self, mes):
-		return getRandomString(random.randrange(1, 50))
+		return getRandomString(random.randrange(1, 50)) #Return random data back
 
 	def startSendingCoverTraffic(self):
 		threading.Thread(target = self.sendCoverTraffic).start()
@@ -1054,7 +1054,7 @@ class Peer:
 			if len(self.neighbourSet) != 0:
 				peer = random.sample(self.neighbourSet, 1)[0]
 				try:
-					self.makeProxy(strAddress(peer)).coverTraffic(getRandomString(random.randrange(1, 50)))
+					self.makeProxy(strAddress(peer)).coverTraffic(getRandomString(random.randrange(1, 50))) #Spaaaam!
 				except ConnectionError as err:
 					self.evictPeers([peer])
 			time.sleep(random.randrange(0, 50))
