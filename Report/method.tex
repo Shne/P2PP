@@ -50,6 +50,20 @@ One is the general operations of the network. Neighbours will constantly contact
 
 The second source of cover traffic is explicit cover traffic. Peers will at random intervals send random data of random lengths between each other. This data ensures unpredictable network traffic, and hinders traffic analysis even further.
 
+\subsection{Providing Proof of Work}
+
+To keep the network stable, and free from Sybil-style attacks, we use a proof of work system. This ensures that peers that wish to put a strain on the network, or affect the overlay network structure, will need to expend large amounts of computational resources to do so.
+
+The proof of work system is based on HashCash \citep{HashCash}, and requires a peer to generate a partial hash collision with the timestamped resource, using the SHA-256 hashing algorithm. How large a collision and how new a time stamp is fully configurable.
+
+A proof of work is currently required in 2 circumstances.
+
+The first is when a peer wishes to join the neighbourhood of another peer. In requiring a proof of work for joining or moving within the network, we make Sybil and Eclipse attacks less likely, while imposing little to no hindrance on long-term stable peers.
+
+The second proof of work is required when a peer wishes to send a message. This is to deter spamming of the network, and to prevent malicious peers from forcing other peers to spend an unwanted amount of time trying to decrypt messages, or drown a single peer in messages after having obtained its public key.
+
+Note that the standard settings for the required bits of a proof of work are currently quite low, in order to allow rapid testing of the network
+
 \subsection{Public Key Distribution}
 
 When a peer wishes to communicate chat messages to another peer, it is required to know the public key of the recipient.
