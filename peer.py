@@ -894,16 +894,19 @@ class Peer:
 			print(proof)
 			return None
 
+		signature = None
+
 		self.messagesSet.add(mhash)
 		if self.cipher is not None: # No reason to try to snoop without a secret
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
 				print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
 
+				time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
+
 				digest = SHA256.new()
 				digest.update(decryptedMessage)
 				signature = self.signer.sign(digest)
-				return signature
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 
@@ -911,7 +914,7 @@ class Peer:
 		for result in neighbourResults:
 			if result is not None:
 				return result
-		return None
+		return signature
 		# for peer in self.neighbourSet:
 		# 	self.forwardMessage(peer, message)
 
@@ -976,6 +979,9 @@ class Peer:
 					self.messagesSet.add(mhash)
 					unnoncedMessage = unnonceMsg(decryptedMessage, nonce)
 					print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  unnoncedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
+				
+				time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
+
 				digest = SHA256.new()
 				digest.update(decryptedMessage)
 				signature = self.signer.sign(digest)
@@ -1021,7 +1027,7 @@ class Peer:
 	def checkSender(self, decryptedMessage, signature):
 		digest = SHA256.new()
 		digest.update(decryptedMessage)
-		sender = "???"
+		sender = "???" 
 		if signature is None:
 			return sender
 		for k, v in self.friends.items():

@@ -12,7 +12,7 @@
 
 ~~improvement: use nonce when encrypting message, so same message can be sent more than once and better security #Doesn't the encrypter thing do this?~~
 
-improvement: What if multiple members return signature? Eg. malicious client. Might be an idea to get a list, and check everyone #See k-walker #jhk: so is it done?
+improvement: What if multiple members return signature? Eg. malicious client. Might be an idea to get a list, and check everyone #See k-walker #jhk: so is it done? #kve: Its done for k-walker, not for flooding
 
 ~~Allow senders to sign message (take as parameter, check against friends)~~
 
@@ -47,6 +47,6 @@ Look into group chat
 
 Testing: Create tests to measure stuff (~~Time to form network~~, time to send message, k-walker hit rate, ~~cardinality of DH pools~~)
 
-Improvement: Short delay before acking message
+~~Improvement: Short delay before acking message ~~
 
 Improvement: check for proof of work more places
