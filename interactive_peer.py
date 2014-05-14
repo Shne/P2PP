@@ -254,12 +254,12 @@ while True:
 			print(formatMap(thisPeer.getAllNeighbours(), thisPeer.getMessagesPerPeer()))
 		continue
 
-	match = re.match(r"message ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$", do)
+	match = re.match(r"message ([a-zA-Z0-9]+) ([a-zA-Z0-9\ ]+)$", do)
 	if match:
 		thisPeer.sendMessage(match.group(1), match.group(2))
 		continue
 
-	match = re.match(r"kmessage ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$", do)
+	match = re.match(r"kmessage ([a-zA-Z0-9]+) ([a-zA-Z0-9\ ]+)$", do)
 	if match:
 		thisPeer.kSendMessage(match.group(1), match.group(2), 64, 32) #Note very low TTL
 		continue
