@@ -1,0 +1,41 @@
+\section{Use Case}
+
+When developing the system we maintained clear goals for the required features of the system, which helped us not only remember why we were developing the system, but also guide the project in the right direction.
+
+These goals are best illustrated in use case format, as follows:
+
+\subsection{Use case 1: Chinese Dissidents}
+\begin{description}
+\item[Primary Actor:] 2 Chinese citizens with a wish for democracy.
+\item[Goal:] To exchange thoughts and literature about democracy in a way that is safe, secure, and not under government scrutiny.
+\item[Other interested Parties:] The Chinese government.
+\item[Preconditions:] It is assumed that both citizens have exchanged public keys prior to the use case (by carrier pigeon).
+In order to avoid data analysis attempts, a secure channel to a peer located outside the reach of the Chinese government would be also preferred.
+\item[Success Criteria:] Using the developed system, the two citizens should be able to send chat messages to each other, with a guarantee that they cannot be read by 3rd party actors.
+Additionally, they should be able to know who sent the messages, and whether their messages reach their destination.
+Finally, it should be difficult to determine that these two citizens are communicating.
+\item[Method:]
+\begin{enumerate}
+\item Both citizens add their private key to the system.
+\item Both citizens set up the public key of each other in the system.
+\item The citizens start sending messages.
+\item The citizens look for confirmation messages from the system.
+\end{enumerate}
+\end{description}
+
+\subsection{Use case 2: Young Love}
+\begin{description}
+\item[Primary Actor:] The young doe-eyed girl Earlene.
+\item[Goal:] Earlene wishes to profess her love to Billy Ray, the handsome new farmhand, in intimate prose, yet she does not wish to reveal her identity yet. 
+\item[Other interested Parties:] Billy Ray, the manliest farmhand around.
+\item[Preconditions:] It is assumed that Earlene has obtained the hash address of Billy Ray, either through teenage girl gossip, or to phone book. Also required is Billy Ray's willing publishing of his public key.
+\item[Success Criteria:] Earlene should be able to express her innermost desires to Billy Ray, without him know her identity.
+\item[Method:]
+\begin{enumerate}
+\item Earlene uses the system to fetch the public-key of Billy Ray.
+\item Earlene condenses her desires into a 20-page novella with graphic descriptions of the surrounding landscape.
+\item Earlene sends the message unsigned to Billy Ray.
+\item The message is received at Billy Rays end, and Earlene receives a signed acknowledgement.
+\end{enumerate}
+\item[Additional details:] Should Earlene wish to continue secret communication with Billy Ray, she might generate a new RSA key pair, publish the public key, and attach the corresponding hash address in her message.
+\end{description}
