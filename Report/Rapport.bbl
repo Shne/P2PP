@@ -38,4 +38,24 @@ Adam Back.
 \newblock Tech Report, 2002
 \newblock URL \url{http://www.hashcash.org/papers/hashcash.pdf}
 
+
+\bibitem[Freedman and Morris(2002)]{tarzan}
+Freedman, Michael J. and Morris, Robert.
+\newblock Tarzan: a peer-to-peer anonymizing network layer, 2002
+
+\bibitem[Clarke et. al(2002)]{freenet}
+Clarke, Ian and Miller, Scott G. and Hong, Theodore W. and Sandberg, Oskar and Wiley, Brandon.
+\newblock Protecting Free Expression Online with Freenet, 2002
+
+\bibitem[Warren(2012)]{bitmessage}
+Jonathan Warren
+\newblock Bitmessage: A Peer-to-Peer Message Authentication and Delivery System 
+\newblock URL \url{https://bitmessage.org/bitmessage.pdf}
+
+\bibitem[Ebbesen, Knudsen and Pedersen(2014)]{P2PN}
+Kris V. Ebbesen, Jan H. Knudsen and Roland L. Pedersen.
+\newblock Peer to Peer Networks.
+\newblock Course Report, 2014
+
+
 \end{thebibliography}
