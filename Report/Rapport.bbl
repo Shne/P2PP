@@ -32,4 +32,10 @@ Whitfield Diffie and Martin~E Hellman.
 \newblock \emph{Information Theory, IEEE Transactions on}, 22\penalty0
   (6):\penalty0 644--654, 1976.
 
+\bibitem[Back(2002)]{HashCash}
+Adam Back.
+\newblock Hashcash - A Denial of Service Counter-Measure.
+\newblock Tech Report, 2002
+\newblock URL \url{http://www.hashcash.org/papers/hashcash.pdf}
+
 \end{thebibliography}
