@@ -1,0 +1,16 @@
+tests:
+- kWalker vs floding. Er kWalker med sikkerheds stuff bedre end flooding med sikkerheds stuff.
+- kik paa latency.
+- start af netvaerk med eller uden "proof of work".
+- single peer proof of work against sybil.
+- ADH performance. Make it secure while still performing well, cardinality.
+- proof of work is not tough to verify
+
+Report
+- We have applied these techniques to a general unstructured network and made it work. 
+- Remember to describe the different techniques.
+- Discussion of cover traffic. Ours is simple. What could be improved.
+- Message tampering. Sender cannot be verified
+- Future work: Ensure neighbours from multiple subnets
+- Problems with man in the middle attacks because of anon DH. Discuss
+
