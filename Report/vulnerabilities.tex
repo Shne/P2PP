@@ -1,0 +1,28 @@
+\section{Known Vulnerabilities}
+
+In this sections we describe areas where we know our system to be insecure. Some of these are lack of functionality in the system, and some are fundamental problems in the underlying components. Not that we will not mention attacks such as cracking RSA-keys, since these attacks are very general, and much more far-reaching than our system itself.
+
+\subsection{Anonymous Diffie-Hellman Man in the Middle}
+
+Encryption between peers is based on the Anonymous Diffie-Hellman key exchange scheme. This scheme does however have a major security flaw, in that it is wide open to man in the middle attacks. Unfortunately, since we do not have any prior knowledge about our peers before initiating the encrypted connection, it becomes quite problematic to use any of the more secure transport encryption schemes.
+
+\subsection{Eclipse-based traffic analysis}
+
+If an adversary can completely surround a peer, it becomes quite easy to determine when that peer has sent or received a message, since it is possible to monitor which messages and acknowledgements exit the peer without having come in.
+Proof of work for network relocation limits this, but it does not make it impossible.
+
+\subsection{Python XML-RPC is Insecure}
+
+The XMLRPC library distributed with the python package is vulnerable to several types of Denial of Service attacks. Most of these are quite applicable to most XML-based system. More information can be found at \citep{XMLRPCBAD}.
+
+\subsection{Denial of Service on Key Distribution}
+
+Currently, the key fetching mechanism relies of the underlying network having a reliable way of retrieving resources. In our current system, a single malicious peer could report itself as the location of any requested resource, and respond with garbage data when asked for its value. Note that this can not be used to swap public keys, only prevent their distribution.
+
+\subsection{Key Hash Collision}
+
+If it proves possible to generate RSA key pairs where the public key has a specified SHA-256 hash, it is easy to fool the key distribution mechanism. We do however not know of any attacks of this kind, and believe it to be quite difficult. Crypto might prove us wrong.
+
+\subsection{Spamming without Proof of Work}
+
+Currently, we require proof of work for sending messages and requesting neighbours, but there are still quite a few operations that might require quite a bit of power from the other peers, yet require no proof of work. A malicious peer could exploit these operations in a denial of service attack on the system. This could be easily prevented by requiring a proof of work for additional operations. 
