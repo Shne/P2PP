@@ -26,10 +26,13 @@ All chat messages in the system may or may not be signed by the sender. If the s
 
 Both types of signatures are done according to \textbf{PKCS\#1 v1.5} (TODO:Some sort of reference).
 
-In the case of the sender signing a message, we send a signature of the plain-text message along with the encrypted message. This ensures, that only after obtaining the decrypted message will it be possible to verify the signature. This ensures that we keep the identity of the sender hidden to anyone except the recipient, and that the recipient can securely verify the sender given his public key. Also, should anyone attempt to tamper with the message before delivery, the signature will no longer be valid.
+In the case of the sender signing a message, we send a signature of the plain-text message along with the encrypted message. This ensures, that only after obtaining the decrypted message will it be possible to verify the signature. This ensures that we keep the identity of the sender hidden to anyone except the recipient, and that the recipient can securely verify the sender given his public key.
 
-When verifying the delivery of a message the receiver returns a signed digest of the plaintext message, which is verified by the sender. This ensures that the sender has received the message, as he is the only one able to provide a valid signature. If the peer is using flooding we simply return this value as part of the xml-rpc call, while we answer back using a k-walker in the case that we receive a message by k-walker. Given a small random delay, it becomes difficult to determine whether a message was received by any given peer, or one of his neighbours. Also, should anyone tamper with the message before delivery, the receiver will no longer sign the correct data, making this easily detectable for the sender.
+When verifying the delivery of a message the receiver returns a signed digest of the plaintext message, which is verified by the sender. This ensures that the sender has received the message, as he is the only one able to provide a valid signature. If the peer is using flooding we simply return this value as part of the xml-rpc call, while we answer back using a k-walker in the case that we receive a message by k-walker. Given a small random delay, it becomes difficult to determine whether a message was received by any given peer, or one of his neighbours. 
 
+It should be noted, that should a message content be tampered with before being delivered, the signature of the sender will no longer be valid. This ensures that any message that is tampered will have no valid signature, and be seen as an anonymous message.
+Additionally the receiver signature for message delivery guarantee will not match the expected signature at the sender's end, and the message will not report as being delivered.
+ 
 \subsection{Encrypting Peer Communication}
 
 All traffic between peers in the network is encrypted using anonymous Diffie-Hellman~\citep{DH} encryption. This encryption is provided by wrapping connections between peers in an SSL layer, with no certificates and anonymous Diffie-Hellman as the only cipher set.
