@@ -34,6 +34,8 @@ import base64
 
 from hashcash import mint, check
 
+PoW_bits = 0
+
 	#########################
 	# Classes for safer RPC #
 	#########################
@@ -51,7 +53,7 @@ class RPCThreading(ThreadingMixIn, SimpleXMLRPCServer): #I have literally no ide
 			print("Forbidden: " + method )
 			return None
 		try:
-			time.sleep(self.artLatency) #artifical network delay
+			# time.sleep(self.artLatency) #artifical network delay
 			return super(RPCThreading, self)._dispatch(method, params)
 		except:
 			traceback.print_exc()
@@ -350,7 +352,7 @@ class Peer:
 		potentials = [peer for peer in self.peerSet if (not peer in self.neighbourSet) and (not strName(peer) == self.name)]
 		if(len(potentials) != 0):
 			neighbour = random.choice(potentials)
-			proof = mint(self.address.replace(':', '?'), bits = 12)
+			proof = mint(self.address.replace(':', '?'), PoW_bits)
 			try:
 				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit, proof):
 					return self.addNeighbour(neighbour)
@@ -367,7 +369,7 @@ class Peer:
 	@RPC
 	def requestAddNeighbour(self, name, address, limit, proof):
 
-		if not check(proof, address.replace(':', '?'), bits = 12):
+		if not check(proof, address.replace(':', '?'), PoW_bits):
 			print("Invalid proof of work")
 			print(proof)
 			return False
@@ -660,7 +662,8 @@ class Peer:
 
 	@RPC
 	def getAllMessagesPassed(self):
-		return sum([self.makeProxy(strAddress(p)).getMessagesPassed() for p in self.peerSet])
+		with self.peerSetLock:
+			return sum([self.makeProxy(strAddress(p)).getMessagesPassed() for p in self.peerSet])
 
 	@RPC
 	def getMessagesPerPeer(self):
@@ -885,6 +888,8 @@ class Peer:
 	#Recieve message, check if it's for us, try to decode it and pass it on
 	@RPC
 	def receiveMessage(self, message, sig, proof): #Note: message is an XMLRPC binary data wrapper
+		self.messagesPassed += 1
+
 		mhash = hash(message.data)
 		if mhash in self.messagesSet:
 			return None
@@ -902,7 +907,7 @@ class Peer:
 				decryptedMessage = self.cipher.decrypt(message.data)
 				print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  decryptedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
 
-				time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
+				# time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
 
 				digest = SHA256.new()
 				digest.update(decryptedMessage)
@@ -963,6 +968,8 @@ class Peer:
 
 	@RPC
 	def kReceiveMessage(self, message, nonce, ttl, sig, proof): #Note: message is an XMLRPC binary data wrapper
+		self.messagesPassed += 1
+
 		if ttl < 0:
 			return None
 
@@ -980,12 +987,13 @@ class Peer:
 					unnoncedMessage = unnonceMsg(decryptedMessage, nonce)
 					print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  unnoncedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
 				
-				time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
+					# time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
 
-				digest = SHA256.new()
-				digest.update(decryptedMessage)
-				signature = self.signer.sign(digest)
-				self.kAck(xmlrpc.client.Binary(signature), 32) #TODO:do something smarter about k/ttl
+					digest = SHA256.new()
+					digest.update(decryptedMessage)
+					signature = self.signer.sign(digest)
+					for i in range(10): #send many acks
+						self.kAck(xmlrpc.client.Binary(signature), 32) #TODO:do something smarter about k/ttl
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig, proof))
@@ -1005,14 +1013,14 @@ class Peer:
 		if ttl < 0: #It's dead mang!
 			return None
 		if not (ack.data in self.acksSet): #Make sure we haven't checked the ack before
+			self.acksSet.add(ack.data) #remember we've checked this ack
 			for k, v in self.awaitingAcks.items(): #Check for each ack we're missing
 				(digest, signer) = v
 				if signer.verify(digest, ack.data):
 					print("Message delivered and acknowledged: " + k)
 					del self.awaitingAcks[k] #No need to keep this around
-					break
-		self.acksSet.add(ack.data) #remember we've checked this ack
-
+					return
+		
 		forwardThread = threading.Thread(target=self.safeForwardKAck, args=(ack, ttl-1))
 		forwardThread.start() #To infinity, and beyond!
 
