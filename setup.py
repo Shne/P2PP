@@ -11,13 +11,13 @@ numberOfPeers = args.peers
 
 names = ['P'+str(x) for x in range(numberOfPeers)]
 IP = 'localhost'
-ports = [7000+x for x in range(numberOfPeers)]
+ports = [10000+x for x in range(numberOfPeers)]
 
 
 for (i,name) in enumerate(names):
 	limit = 3
 	while random.choice([True, True, True, False]):
-		limit = limit + 1
+		limit += 1
 	peer = Peer(name, IP, ports[i], str(limit), args.late)
 	peer.addResource(name, name + " iz best peer")
 	peer.multicast()

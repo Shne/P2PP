@@ -8,20 +8,20 @@ import re
 from peer import Peer
 import random
 
-noOfPeers = 20
 try:
-    print('Setting up network...')
-    #setup = pexpect.spawn('./setup.py -peers 100', timeout=2000)
+    #print('Setting up network...')
+    #setup = pexpect.spawn('python3.4 setup.py -peers 100', timeout=2000)
     #setup.expect('>')
     start = time.time()
     print('start: {:.2f}'.format(start))
 
     numberOfPeers = 20
-    names = ['Peer' + str(x) for x in range(numberOfPeers)]
+    names = ['Peer'+str(x) for x in range(numberOfPeers)]
     IP = 'localhost'
-    ports = [7200 + x for x in range(numberOfPeers)]
+    ports = [7300+x for x in range(numberOfPeers)]
 
-    for (i, name) in enumerate(names):
+
+    for (i,name) in enumerate(names):
         limit = 3
         while random.choice([True, True, True, False]):
             limit += 1
@@ -34,8 +34,8 @@ try:
         peer.startSendingCoverTraffic()
 
     end = time.time()
-    totalTime = '{:.2f}'.format(end - start)
-    print(totalTime + ' sec to join network for ' + str(noOfPeers) + ' peers')
+    totalTime = '{:.2f}'.format(end-start)
+    print(totalTime + ' sec to join network for ' + str(numberOfPeers) + ' peers')
 
 except pexpect.TIMEOUT as err:
     print('Timeout error')
