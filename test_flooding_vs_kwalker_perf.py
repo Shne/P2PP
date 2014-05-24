@@ -6,7 +6,7 @@ import time
 import pexpect
 import re
 
-timeout = 240
+timeout = 420
 baseMsg = 'plplplplplp'
 messages = 10
 try:

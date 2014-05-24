@@ -972,7 +972,7 @@ class Peer:
 			except KeyError:
 				return # we have received ack
 			print('sending message')
-			for i in range(8):
+			for i in range(4):
 				self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature), proof)
 			time.sleep(sleepTime)
 			ttl = 2*ttl
@@ -1008,7 +1008,7 @@ class Peer:
 				digest.update(decryptedMessage)
 				signature = self.signer.sign(digest)
 				sleepTime, ttl = sleepTtl
-				for i in range(8):
+				for i in range(4):
 					self.kAck(xmlrpc.client.Binary(signature), ttl)
 				time.sleep(sleepTime)
 				self.messagesDict[mhash] = (sleepTime*2, ttl*2)
