@@ -1,0 +1,67 @@
+100 peers, 4 walkers ad gangen, defaults: (1,64), gange med 2
+time: 33.97544074058533
+total messages: 3192
+
+time: 171.31015038490295
+total messages: 12110
+
+time: 193.8692662715912
+total messages: 15053
+
+
+100 peers, 4 walkers ad gangen, defaults: (1,32), gange med 2
+time: 85.65210556983948
+total messages: 9038
+
+time: 52.168959856033325
+total messages: 5199
+
+time: 168.2938323020935
+total messages: 11620
+
+time: 128.8120472431183
+total messages: 10107
+
+
+
+100 peers, 8 walkers ad gangen, defaults: (1,64), gange med 2
+time: 302.2337501049042
+timeout
+
+time: 222.50102353096008
+total messages: 16305
+
+
+100 peers, 8 walkers ad gangen, defaults: (1,32), gange med 2
+time: 137.65780353546143
+total messages: 10616
+
+time: 19.167693853378296
+total messages: 2601
+
+time: 295.263879776001
+timeout
+
+
+100 peers, 8 walkers ad gangen, defaults: (1,16), gange med 2
+time: 161.2743022441864
+total messages: 13621
+
+time: 240.18260049819946
+timeout
+
+
+100 peers, 16 walkers ad gangen, defaults: (1,16), gange med 2
+time: 255.5088427066803
+total messages: 17980
+
+timeout
+
+
+100 peers, 4 walkers ad gangen, defaults: (1,64), gange med 1.5
+time: 213.41594433784485
+total messages: 16450
+
+time: 28.965116024017334
+total messages: 3498
+

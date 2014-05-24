@@ -46,25 +46,27 @@ try:
 	print('starting flooding test')
 
 	# FLOODING
-	# start = time.time()
-	# for i in range(messages):
-	# 	msg = baseMsg+str(i)
-	# 	peer1.sendline('message peer2 '+msg)
-	# 	peer2.expect('Received Message from peer1: '+msg+'\r\n')
-	# 	print('msg received')
-	# 	peer1.expect('peer2 received message! \(verified\)\r\n')	
-	# 	print('msg verified')
-	# end = time.time()
-	# print('Flooding test done!')
-	# print('time: '+str(end-start))
-	# peer1.sendline('mpassed-all')
-	# peer1.expect('Messages passed by all peers in network: (\d+)\r\n')
-	# mpassed = re.compile('\d+').search(str(peer1.after)).group()
-	# print('total messages: '+mpassed)
+	start = time.time()
+	for i in range(messages):
+		msg = baseMsg+str(i)
+		peer1.sendline('message peer2 '+msg)
+		peer2.expect('Received Message from peer1: '+msg+'\r\n')
+		print('msg received')
+		peer1.expect('peer2 received message! \(verified\)\r\n')	
+		print('msg verified')
+	end = time.time()
+	print('Flooding test done!')
+	print('time: '+str(end-start))
+	peer1.sendline('mpassed-all')
+	peer1.expect('Messages passed by all peers in network: (\d+)\r\n')
+	mpassed = re.compile('\d+').search(str(peer1.after)).group()
+	print('total messages: '+mpassed)
 
 	#reset for next test
 	peer1.sendline('fullreset-all')
 	peer1.expect('>')
+
+	print('starting kwalker test')
 
 	# K WALKER
 	start = time.time()
