@@ -1,0 +1,32 @@
+100 peers, 4 walkers ad gangen, defaults: (1,64), gange med 2
+time: 33.97544074058533
+total messages: 3192
+
+time: 171.31015038490295
+total messages: 12110
+
+time: 193.8692662715912
+total messages: 15053
+
+
+100 peers, 8 walkers ad gangen, defaults: (1,64), gange med 2
+time: 302.2337501049042
+timeout
+
+time: 222.50102353096008
+total messages: 16305
+
+100 peers, 8 walkers ad gangen, defaults: (1,32), gange med 2
+time: 137.65780353546143
+total messages: 10616
+
+
+
+
+100 peers, 4 walkers ad gangen, defaults: (1,64), gange med 1.5
+time: 213.41594433784485
+total messages: 16450
+
+time: 28.965116024017334
+total messages: 3498
+

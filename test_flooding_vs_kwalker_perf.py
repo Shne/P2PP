@@ -6,12 +6,12 @@ import time
 import pexpect
 import re
 
-timeout = 300
+timeout = 240
 baseMsg = 'plplplplplp'
-messages = 4
+messages = 10
 try:
 	start = time.time()
-	setup = pexpect.spawn('./setup.py -peers 100', timeout=120)
+	setup = pexpect.spawn('./setup.py -peers 100', timeout=90)
 	setup.expect('>')
 	end = time.time()
 	print('setup.py done')
@@ -34,8 +34,8 @@ try:
 	peer2.expect('>')
 
 	# wait for network to manifest
-	print('wiating 25 seconds for network to form')
-	time.sleep(30)
+	print('waiting 20 seconds for network to form')
+	time.sleep(20)
 
 	# befriend eachother
 	peer1.sendline('friend peer2 public2.pem')
@@ -46,21 +46,21 @@ try:
 	print('starting flooding test')
 
 	# FLOODING
-	start = time.time()
-	for i in range(messages):
-		msg = baseMsg+str(i)
-		peer1.sendline('message peer2 '+msg)
-		peer2.expect('Received Message from peer1: '+msg+'\r\n')
-		print('msg received')
-		peer1.expect('peer2 received message! \(verified\)\r\n')	
-		print('msg verified')
-	end = time.time()
-	print('Flooding test done!')
-	print('time: '+str(end-start))
-	peer1.sendline('mpassed-all')
-	peer1.expect('Messages passed by all peers in network: (\d+)\r\n')
-	mpassed = re.compile('\d+').search(str(peer1.after)).group()
-	print('total messages: '+mpassed)
+	# start = time.time()
+	# for i in range(messages):
+	# 	msg = baseMsg+str(i)
+	# 	peer1.sendline('message peer2 '+msg)
+	# 	peer2.expect('Received Message from peer1: '+msg+'\r\n')
+	# 	print('msg received')
+	# 	peer1.expect('peer2 received message! \(verified\)\r\n')	
+	# 	print('msg verified')
+	# end = time.time()
+	# print('Flooding test done!')
+	# print('time: '+str(end-start))
+	# peer1.sendline('mpassed-all')
+	# peer1.expect('Messages passed by all peers in network: (\d+)\r\n')
+	# mpassed = re.compile('\d+').search(str(peer1.after)).group()
+	# print('total messages: '+mpassed)
 
 	#reset for next test
 	peer1.sendline('fullreset-all')
@@ -72,7 +72,9 @@ try:
 		msg = baseMsg+str(i)
 		peer1.sendline('kmessage peer2 '+msg)
 		peer2.expect('Received Message from peer1: '+msg+'\r\n')
+		print('msg received')
 		peer1.expect('Message delivered and acknowledged:.+\r\n')
+		print('msg verified')
 	end = time.time()
 	print('KWalker test done!')
 	print('time: '+str(end-start))

@@ -176,6 +176,7 @@ class Peer:
 		self.friends = dict()
 		self.cipher = None
 		self.messagesSet = set([])
+		self.messagesDict = dict()
 		self.acksSet = set([])
 		self.awaitingAcks = dict()
 
@@ -939,7 +940,7 @@ class Peer:
 	# K-Walker Messages #
 	#####################
 
-	def kSendMessage(self, recipient, message, k, ttl):
+	def kSendMessage(self, recipient, message):
 		messageID = self.newSearchId()
 		try:
 			(cipher, signer) = self.friends[recipient]
@@ -963,8 +964,20 @@ class Peer:
 
 		proof = mint(base64.b64encode(encryptedMessage).decode('utf-8'))
 		
-		for i in range(k):
-			self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature), proof)
+		ttl = 32 # default
+		sleepTime = 1 # default
+		while(True):
+			try:
+				self.awaitingAcks[messageID] # check that we haven't received ack yet
+			except KeyError:
+				return # we have received ack
+			print('sending message')
+			for i in range(8):
+				self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature), proof)
+			time.sleep(sleepTime)
+			ttl = 2*ttl
+			sleepTime = 2*sleepTime
+			
 
 	@RPC
 	def kReceiveMessage(self, message, nonce, ttl, sig, proof): #Note: message is an XMLRPC binary data wrapper
@@ -982,18 +995,23 @@ class Peer:
 			try: #Only recipient can decode data
 				decryptedMessage = self.cipher.decrypt(message.data)
 				mhash = hash(message.data)
-				if not (mhash in self.messagesSet): #We might end up here a lot
-					self.messagesSet.add(mhash)
+				if not (mhash in self.messagesDict): #We might end up here a lot
+					sleepTtl = (1, 32) #default (sleeptime, ttl)
+					self.messagesDict[mhash] = sleepTtl
 					unnoncedMessage = unnonceMsg(decryptedMessage, nonce)
 					print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  unnoncedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
-				
+				else:
+					sleepTtl = self.messagesDict[mhash]
 					# time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
 
-					digest = SHA256.new()
-					digest.update(decryptedMessage)
-					signature = self.signer.sign(digest)
-					for i in range(10): #send many acks
-						self.kAck(xmlrpc.client.Binary(signature), 32) #TODO:do something smarter about k/ttl
+				digest = SHA256.new()
+				digest.update(decryptedMessage)
+				signature = self.signer.sign(digest)
+				sleepTime, ttl = sleepTtl
+				for i in range(8):
+					self.kAck(xmlrpc.client.Binary(signature), ttl)
+				time.sleep(sleepTime)
+				self.messagesDict[mhash] = (sleepTime*2, ttl*2)
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig, proof))

@@ -1,0 +1,31 @@
+setup.py done
+time: 19.746951580047607
+wiating 25 seconds for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 32.77359652519226
+total messages: 5902
+KWalker test done!
+time: 60.52452802658081
+total messages: 11512
+
