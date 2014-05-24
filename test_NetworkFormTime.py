@@ -26,8 +26,6 @@ try:
 		totalTime = '{:.2f}'.format(time.time())
 		print(totalTime + ' ' + nadded)
 
-	
-
 except pexpect.TIMEOUT as err:
 	print('peer1.before: '+str(peer1.before))
 	print('peer1.after: '+str(peer1.after))
