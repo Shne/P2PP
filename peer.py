@@ -964,15 +964,15 @@ class Peer:
 
 		proof = mint(base64.b64encode(encryptedMessage).decode('utf-8'))
 		
-		ttl = 32 # default
-		sleepTime = 1 # default
+		ttl = 64 # default
+		sleepTime = 4 # default
 		while(True):
 			try:
 				self.awaitingAcks[messageID] # check that we haven't received ack yet
 			except KeyError:
 				return # we have received ack
 			print('sending message')
-			for i in range(4):
+			for i in range(16):
 				self.kReceiveMessage(wrappedEncryptedMessage, nonce, ttl, xmlrpc.client.Binary(signature), proof)
 			time.sleep(sleepTime)
 			ttl = 2*ttl
@@ -996,22 +996,18 @@ class Peer:
 				decryptedMessage = self.cipher.decrypt(message.data)
 				mhash = hash(message.data)
 				if not (mhash in self.messagesDict): #We might end up here a lot
-					sleepTtl = (1, 32) #default (sleeptime, ttl)
-					self.messagesDict[mhash] = sleepTtl
+					ttl = 64 #default
+					self.messagesDict[mhash] = ttl
 					unnoncedMessage = unnonceMsg(decryptedMessage, nonce)
 					print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  unnoncedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
-				else:
-					sleepTtl = self.messagesDict[mhash]
 					# time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time 
 
 				digest = SHA256.new()
 				digest.update(decryptedMessage)
 				signature = self.signer.sign(digest)
-				sleepTime, ttl = sleepTtl
-				for i in range(4):
+				for i in range(16):
 					self.kAck(xmlrpc.client.Binary(signature), ttl)
-				time.sleep(sleepTime)
-				self.messagesDict[mhash] = (sleepTime*2, ttl*2)
+				self.messagesDict[mhash] = ttl*2
 			except ValueError:
 				pass #We end up here when trying to decrypt with a non-matching key
 		forwardThread = threading.Thread(target=self.safeForwardKWalker, args=(message, nonce, ttl-1, sig, proof))
