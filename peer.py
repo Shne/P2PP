@@ -353,7 +353,7 @@ class Peer:
 		potentials = [peer for peer in self.peerSet if (not peer in self.neighbourSet) and (not strName(peer) == self.name)]
 		if(len(potentials) != 0):
 			neighbour = random.choice(potentials)
-			proof = mint(self.address.replace(':', '?'), PoW_bits)
+			proof = mint((self.address + strAddress(neighbour)).replace(':', '?'), PoW_bits)
 			try:
 				if self.makeProxy(strAddress(neighbour)).requestAddNeighbour(self.name, self.address, self.peerLimit, proof):
 					return self.addNeighbour(neighbour)
@@ -370,7 +370,7 @@ class Peer:
 	@RPC
 	def requestAddNeighbour(self, name, address, limit, proof):
 
-		if not check(proof, address.replace(':', '?'), PoW_bits):
+		if not check(proof, (address+self.address).replace(':', '?'), PoW_bits):
 			print("Invalid proof of work")
 			print(proof)
 			return False
