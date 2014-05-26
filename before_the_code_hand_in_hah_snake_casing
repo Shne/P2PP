@@ -1,2 +1,5 @@
 hashcash timeout back to 120
 proof of work for join back to 12
+look at sleep time for acks
+
+proof of work for sending back to 12

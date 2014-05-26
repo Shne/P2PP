@@ -1,0 +1,362 @@
+10 peers
+setup.py done
+time: 0.5543928146362305
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 25.7429039478302
+total messages: 325
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 31.320996046066284
+total messages: 311
+------------
+20 peers
+setup.py done
+time: 0.6024160385131836
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 30.755627870559692
+total messages: 524
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 41.820403814315796
+total messages: 468
+------------
+30 peers
+setup.py done
+time: 0.8886280059814453
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 33.45817494392395
+total messages: 829
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 51.29463505744934
+total messages: 975
+------------
+40 peers
+setup.py done
+time: 0.6674728393554688
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 40.54392695426941
+total messages: 1179
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 61.31515717506409
+total messages: 1450
+------------
+50 peers
+setup.py done
+time: 0.8335909843444824
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 38.523967027664185
+total messages: 1415
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 71.44038915634155
+total messages: 1258
+------------
+60 peers
+setup.py done
+time: 0.7555348873138428
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 46.8122820854187
+total messages: 1812
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 81.57893204689026
+total messages: 1954
+------------
+70 peers
+setup.py done
+time: 1.0947651863098145
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 45.10707497596741
+total messages: 1910
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 116.51708006858826
+total messages: 2549
+------------
+80 peers
+setup.py done
+time: 0.8605990409851074
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 49.54681706428528
+total messages: 2292
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 114.02731394767761
+total messages: 2612
+------------
+90 peers
+setup.py done
+time: 0.9086470603942871
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 45.50350284576416
+total messages: 2365
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 111.57406902313232
+total messages: 1410
+------------
+100 peers
+setup.py done
+time: 1.1808269023895264
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 63.22734093666077
+total messages: 3031
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 130.47620105743408
+total messages: 2651
+------------
+70 peers
+setup.py done
+time: 1.0947651863098145
+waiting for network to form
+starting flooding test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+Flooding test done!
+time: 45.10707497596741
+total messages: 1910
+starting kwalker test
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+msg received
+msg verified
+KWalker test done!
+time: 116.51708006858826
+total messages: 2549
