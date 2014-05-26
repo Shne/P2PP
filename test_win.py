@@ -52,7 +52,7 @@ try:
 	start = time.time()
 	#send message via flooding
 	peer1.sendline('message peer2 '+msg)
-	peer2.expect('Received Message from peer1: '+msg)
+	#peer2.expect('Received Message from peer1: '+msg)
 	peer1.expect('peer2 received message! \(verified\)')
 	end = time.time()
 	print('Flooding message success!')
@@ -65,7 +65,7 @@ try:
 	start = time.time()
 	# send message via k walker
 	peer1.sendline('kmessage peer2 '+msg)
-	peer2.expect('Received Message from peer1: '+msg+'.*')
+	#peer2.expect('Received Message from peer1: '+msg+'.*')
 	peer1.expect('Message delivered and acknowledged:.+.*')
 	end = time.time()
 	print('KWalker message success!')
