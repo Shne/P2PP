@@ -22,6 +22,7 @@ try:
     names = ['Peer'+str(x) for x in range(numberOfPeers)]
     IP = 'localhost'
     ports = [7300+x for x in range(numberOfPeers)]
+    filename = "proofOfWork20JoiningTimeTestData.txt"
 
     for (i,name) in enumerate(names):
         limit = 3
@@ -35,14 +36,20 @@ try:
         peer.startLookingForDeadNeighbours()
         peer.startSendingCoverTraffic()
 
+        if(i % 10 == 0):
+            end = time.time()
+            totalTime = '{:.2f}'.format(end-start)
+            print(totalTime + ' sec to join network for ' + str(i) + ' peers')
+            with open(filename, "a") as testfile:
+                testfile.write(str(i) + ", " + str(totalTime) + "\n")
+                testfile.close()
+
     end = time.time()
     totalTime = '{:.2f}'.format(end-start)
     print(totalTime + ' sec to join network for ' + str(numberOfPeers) + ' peers')
-
-    with open("proofOfWOrkJoiningTimeTestData.txt", "a") as testfile:
+    with open(filename, "a") as testfile:
         testfile.write(str(numberOfPeers) + ", " + str(totalTime) + "\n")
         testfile.close()
-
 
 
 except pexpect.TIMEOUT as err:

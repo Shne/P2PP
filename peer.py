@@ -34,7 +34,8 @@ import base64
 
 from hashcash import mint, check
 
-PoW_bits = 0
+PoW_bits = 20
+
 
 #########################
 # Classes for safer RPC #
@@ -90,9 +91,11 @@ class DHTransport(xmlrpc.client.Transport):  #xmlrpc-client transport support AD
         else:
             return viables[0]
 
-            ###########
-            # Helpers #
-            ###########
+###########
+# Helpers #
+###########
+
+
 
 
 def strAddress(string):
@@ -198,6 +201,10 @@ class Peer:
     ##################################
     # Make connection and cache it   #
     ##################################
+
+    def setPoW(bits):
+        global PoW_bits
+        PoW_bits = bits
 
     def makeProxy(self, IPPort):
         url = "https://"+IPPort
