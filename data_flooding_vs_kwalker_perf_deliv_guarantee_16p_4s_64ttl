@@ -1,0 +1,63 @@
+### 200 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 121.39724206924438
+total messages: 9744
+KWalker test done!
+time: 63.235429525375366
+total messages: 4251
+
+Flooding test done!
+time: 103.7628538608551
+total messages: 12632
+KWalker test done!
+time: 214.46841168403625
+total messages: 10030
+
+Flooding test done!
+time: 95.07071352005005
+total messages: 11897
+KWalker test done!
+time: 258.4557831287384
+total messages: 15312
+
+Flooding test done!
+time: 82.76922464370728
+total messages: 11995
+KWalker test done!
+time: 44.57102704048157
+total messages: 6631
+
+Flooding test done!
+time: 83.1978759765625
+total messages: 11694
+KWalker test done!
+time: 53.418877363204956
+total messages: 6440
+
+
+
+
+### 175 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 91.01598978042603
+total messages: 10070
+KWalker test done!
+time: 175.2744333744049
+total messages: 13228
+
+Flooding test done!
+time: 83.61247372627258
+total messages: 11679
+KWalker test done!
+time: 54.183175563812256
+total messages: 4967
+
+
+
+### 150 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 68.66204690933228
+total messages: 8954
+KWalker test done!
+time: 53.97926044464111
+total messages: 4757

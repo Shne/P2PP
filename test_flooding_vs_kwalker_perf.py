@@ -11,7 +11,7 @@ baseMsg = 'plplplplplp'
 messages = 10
 try:
 	start = time.time()
-	setup = pexpect.spawn('./setup.py -peers 200', timeout=420)
+	setup = pexpect.spawn('./setup.py -peers 175', timeout=420)
 	setup.expect('>')
 	end = time.time()
 	print('setup.py done')
@@ -81,7 +81,7 @@ try:
 	end = time.time()
 	print('KWalker test done!')
 	print('time: '+str(end-start))
-	time.sleep(5)
+	time.sleep(30)
 	peer1.sendline('mpassed-all')
 	peer1.expect('Messages passed by all peers in network: (\d+)\r\n')
 	mpassed = re.compile('\d+').search(str(peer1.after)).group()
