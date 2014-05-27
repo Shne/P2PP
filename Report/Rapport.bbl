@@ -1,9 +1,14 @@
-\begin{thebibliography}{5}
+\begin{thebibliography}{9}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Kris V.~Ebbesen and Pedersen.(2014)]{P2PN}
+Jan H.~Knudsen Kris V.~Ebbesen and Roland~L. Pedersen.
+\newblock Peer to peer networks.
+\newblock 2014.
 
 \bibitem[Chawathe et~al.(2003)Chawathe, Ratnasamy, Breslau, Lanham, and
   Shenker]{GIA}
@@ -38,9 +43,28 @@ Whitfield Diffie and Martin~E Hellman.
 \newblock \emph{Information Theory, IEEE Transactions on}, 22\penalty0
   (6):\penalty0 644--654, 1976.
 
+\bibitem[Freedman and Morris(2002)]{tarzan}
+Michael~J Freedman and Robert Morris.
+\newblock Tarzan: A peer-to-peer anonymizing network layer.
+\newblock In \emph{Proceedings of the 9th ACM conference on Computer and
+  communications security}, pages 193--206. ACM, 2002.
+
 \bibitem[Back(2002)]{HashCash}
 Adam Back.
 \newblock Hashcash - a denial of service counter-measure.
 \newblock 2002.
+
+\bibitem[Clarke et~al.(2001)Clarke, Sandberg, Wiley, and Hong]{freenet}
+Ian Clarke, Oskar Sandberg, Brandon Wiley, and Theodore~W Hong.
+\newblock Freenet: A distributed anonymous information storage and retrieval
+  system.
+\newblock In \emph{Designing Privacy Enhancing Technologies}, pages 46--66.
+  Springer, 2001.
+
+\bibitem[Warren(2012)]{bitmessage}
+Jonathan Warren.
+\newblock Bitmessage: A peer-to-peer message authentication and delivery
+  system.
+\newblock 2012.
 
 \end{thebibliography}
