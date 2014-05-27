@@ -1,3 +1,33 @@
+### 200 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 121.39724206924438
+total messages: 9744
+KWalker test done!
+time: 63.235429525375366
+total messages: 4251
+
+Flooding test done!
+time: 103.7628538608551
+total messages: 12632
+KWalker test done!
+time: 214.46841168403625
+total messages: 10030
+
+
+
+
+### 150 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 68.66204690933228
+total messages: 8954
+KWalker test done!
+time: 53.97926044464111
+total messages: 4757
+
+
+
+
+
 ### 100 peers ###
 
 Flooding test done!

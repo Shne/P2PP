@@ -11,8 +11,8 @@ The required parameters were the starting values of wait time and TTL as well as
 
 
 \subsection{Flooding vs. k-walkers}
-We tested the time and internal messages passed in the whole network by having two peers join a network of 100 peers and sending 10 messages from one to another, waiting for the acknowledgement of the previous message before sending the next. This test was then repeated to test various network layouts. These tests were performed with Proof-of-Work turned off and no artificial latency introduced in the system.
+We tested the time and internal messages passed in the whole network by having two peers join a network of varying sizes and sending 10 messages from one to another, waiting for the acknowledgement of the previous message before sending the next. This test was then repeated to test various network layouts. These tests were performed with Proof-of-Work turned off and no artificial latency introduced in the system.
 
-Sadly we encountered a bug or a limitation of our testing machine that meant the flooding algorithm didn't reliably for for networks much above 100 peers. The verification simply did not return reliably through the network to the sender, causing the test to pause infinitely and making us restrict our testing to networks less than 100 peers in size. This is unfortunate as we expect the k-walker algorithm to only outperform the flooding algorithm at higher numbers of peers. We will instead try to show that it is plausible that the k-walker algorithm outperforms the flooding algorithm in bigger networks by showing that the performance of the k-walker algorithm relative to the flooding algorithm goes up as the network size increases.
+We weren't able to have networks involving more than 230 or so peers running on the same machine without random peers dying or at least not responding fast enough so we limit our testing to a max network size of 200.
 
 (TODO: Fejlen er fixet. 2 tests, 1 der sammenligner beskeder, og 1 der sammenligner latency)
