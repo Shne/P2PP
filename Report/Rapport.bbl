@@ -1,4 +1,4 @@
-\begin{thebibliography}{3}
+\begin{thebibliography}{5}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -26,6 +26,12 @@ Mihir Bellare and Phillip Rogaway.
 \newblock \doi{10.1007/BFb0053428}.
 \newblock URL \url{http://dx.doi.org/10.1007/BFb0053428}.
 
+\bibitem[Jonsson and Kaliski(2003)]{PKCS}
+Jonsson and Kaliski.
+\newblock Public-key cryptography standards (pkcs) \#1: Rsa cryptography
+  specifications version 2.1.
+\newblock 2003.
+
 \bibitem[Diffie and Hellman(1976)]{DH}
 Whitfield Diffie and Martin~E Hellman.
 \newblock New directions in cryptography.
@@ -34,29 +40,7 @@ Whitfield Diffie and Martin~E Hellman.
 
 \bibitem[Back(2002)]{HashCash}
 Adam Back.
-\newblock Hashcash - A Denial of Service Counter-Measure.
-\newblock Tech Report, 2002
-\newblock URL \url{http://www.hashcash.org/papers/hashcash.pdf}
-
-
-\bibitem[Freedman and Morris(2002)]{tarzan}
-Freedman, Michael J. and Morris, Robert.
-\newblock Tarzan: a peer-to-peer anonymizing network layer, 2002
-
-\bibitem[Clarke et. al(2002)]{freenet}
-Clarke, Ian and Miller, Scott G. and Hong, Theodore W. and Sandberg, Oskar and Wiley, Brandon.
-\newblock Protecting Free Expression Online with Freenet, 2002
-
-\bibitem[Warren(2012)]{bitmessage}
-Jonathan Warren
-\newblock Bitmessage: A Peer-to-Peer Message Authentication and Delivery System 
-\newblock URL \url{https://bitmessage.org/bitmessage.pdf}
-
-\bibitem[Ebbesen, Knudsen and Pedersen(2014)]{P2PN}
-Kris V. Ebbesen, Jan H. Knudsen and Roland L. Pedersen.
-\newblock Peer to Peer Networks.
-\newblock Course Report, 2014
-\newblock URL \url{http://cs.au.dk/~jhk/P2PN_Report.pdf}
-
+\newblock Hashcash - a denial of service counter-measure.
+\newblock 2002.
 
 \end{thebibliography}

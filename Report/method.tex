@@ -7,7 +7,7 @@ The system described is built atop the unstructured network developed during the
 
 The choice of this network was made based on its simplicity and extendibility, and due to the fact that unstructured networks require little information about the peers involved, making it difficult to track which peers are doing what. 
 
-To make the system guarantee an eventual delivery of the message if the sender remains connected, we extended the k-walker algorithm to work somewhat akin to the expanding ring search algorithm wherein the TTL value is increased and the search repeated when a search fails. We send out 4 walkers and wait for a while, if no acknowledgement has been received after the wait, another 4 walkers are sent with double the TTL and double the wait time. Starting values of TTL and wait time is 32 and 1, respectively, which we found through experimentation and measuring. Other values might be better in larger or smaller systems.
+To make the system guarantee an eventual delivery of the message if the sender remains connected, we extended the k-walker algorithm to work somewhat akin to the expanding ring search algorithm wherein the TTL value is increased and the search repeated when a search fails. We send out 4 walkers and wait for a while, if no acknowledgement has been received after the wait, another 4 walkers are sent with double the TTL and double the wait time. Starting values of TTL and wait time is 32 and 1 second, respectively, which we found through experimentation and measuring. Other values might be better in larger or smaller systems.
 
 Note that the techniques used to extend the network could be applied to most unstructured networks, and would probably work just as well on the GIA network.
 
@@ -15,7 +15,7 @@ Note that the techniques used to extend the network could be applied to most uns
 
 In order to ensure that no adversaries can read the content of any given message, we encrypt chat messages travelling across the network using RSA-OAEP~\citep{OAEP}. RSA-OAEP was chosen due to its ease of use, and security against repeated plaintext attacks.
 
-When performing this encryption, we use a pair of RSA (TODO:Mayby reference?) keys. The sender must obtain the public key of the final recipient (how to do this will be explained later), in order to encrypt the message.
+When performing this encryption, we use a pair of RSA keys. The sender must obtain the public key of the final recipient (how to do this will be explained later), in order to encrypt the message.
 
 When the chat message is sent, it is first encrypted by RSA-OAEP using the public key of the recipient, and then broadcast across the network using either flooding or k-walkers. Whenever a peer receives a messages travelling across the network, it will attempt to decrypt it using the corresponding RSA-OAEP decryption using its own private key. This will fail for all peers except the recipient, ensuring that only the final recipient will be able to obtain the contents of the chat message.
 
@@ -27,13 +27,13 @@ It is also worth noting that only one RSA key pair is required to send messages.
 
 All chat messages in the system may or may not be signed by the sender. If the sender wishes not to sign his messages, in order to hide his identity from the receiver, or because he is not in possession of a private key, he may omit this signature. Additionally, any message received by a peer can be acknowledged by returning a signed digest of the message.
 
-Both types of signatures are done according to \textbf{PKCS\#1 v1.5} (TODO:Some sort of reference).
+Both types of signatures are done according to \textbf{PKCS\#1! v1.5} \citep{PKCS}.
 
-In the case of the sender signing a message, we send a signature of the plain-text message along with the encrypted message. This ensures, that only after obtaining the decrypted message will it be possible to verify the signature. This ensures that we keep the identity of the sender hidden to anyone except the recipient, and that the recipient can securely verify the sender given his public key.
+In the case of the sender signing a message, we send a signature of the plain-text message along with the encrypted message. This ensures, that only after obtaining the decrypted message will it be possible to verify the signature, that we keep the identity of the sender hidden to anyone except the recipient, and that the recipient can securely verify the sender given his public key.
 
 When verifying the delivery of a message the receiver returns a signed digest of the plaintext message, which is verified by the sender. This ensures that the sender has received the message, as he is the only one able to provide a valid signature. If the peer is using flooding we simply return this value as part of the xml-rpc call, while we answer back using a k-walker in the case that we receive a message by k-walker. Given a small random delay, it becomes difficult to determine whether a message was received by any given peer, or one of his neighbours. 
 
-It should be noted, that should a message content be tampered with before being delivered, the signature of the sender will no longer be valid. This ensures that any message that is tampered will have no valid signature, and be seen as an anonymous message.
+It should be noted, that if a message content is tampered with before being delivered, the signature of the sender will no longer be valid. This ensures that any message that is tampered will have no valid signature, and be seen as an anonymous message.
 Additionally the receiver signature for message delivery guarantee will not match the expected signature at the sender's end, and the message will not report as being delivered.
  
 \subsection{Encrypting Peer Communication}
