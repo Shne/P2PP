@@ -2,7 +2,15 @@
 We have performed several experiments on our system, both to show that our security measures work, to find optimal parameters and to compare flooding and k-walker approaches with our added security features.
 
 \subsection{Proof-of-Work hinders Sybil Attacks}
-(TODO: ROLAND)
+We prevent sybil attacks by enforcing a strict requirement of proof of work on peers wishing to join the neighbourhood of a healthy peer. It is quite hard to test the actual time required to perform such a task, but we did a simple test of measuring how quickly we are able to create a sybil-like group of peers, and make them appear as a real network, while adjusting the number of bits required in the partial hash collision.
+
+Note that our network enforces a 120 second maximum limit on the age of such proofs of work, to further limit the effectiveness of sybil attacks.
+
+(TODO: Insert graph, iz in Grapes folder)
+
+We see, that with a proof of work requirement of 20 bits, it becomes infeasible to create much more than 40 peers, while more than 90 peers can effectively be created at 12 bits. In reality, one might wish to make the number of bits even higher.
+
+It should be noted, that theoretically, the amount of time required should grow by 16 each time we increase the number of bits by 4. The reason our test shows nowhere near this huge increase is likely that the peers simply get more starved for connections, and form a much sparser network. This means that it is still possible to connect quite a few sybils to the network, but they will have a lesser effect on the other peers, due to their low connectivity.
 
 \subsection{Finding optimal k-walker parameters}
 As described in section~\ref{subsec:base_system}, the k-walker algorithm implements an eventual delivery guarantee as long as sender remains connected to the network by sending out walkers with exponentially increasing TTL at exponentially increasing intervals. Before doing the experiments comparing flooding and k-walkers we needed to find some optimal or at least pretty good parameters for this.
