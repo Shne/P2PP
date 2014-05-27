@@ -2,7 +2,7 @@
 We have performed several experiments on our system, both to show that our security measures work, to find optimal parameters and to compare flooding and k-walker approaches with our added security features.
 
 \subsection{Proof-of-Work hinders Sybil Attacks}
-%TODO: ROLAND
+(TODO: ROLAND)
 
 \subsection{Finding optimal k-walker parameters}
 As described in section~\ref{subsec:base_system}, the k-walker algorithm implements an eventual delivery guarantee as long as sender remains connected to the network by sending out walkers with exponentially increasing TTL at exponentially increasing intervals. Before doing the experiments comparing flooding and k-walkers we needed to find some optimal or at least pretty good parameters for this.
@@ -20,3 +20,9 @@ Sadly we encountered a bug or a limitation of our testing machine that meant the
 \subsection{Cardinality of Diffie-Hellman Pools}
 
 When working with the Pooled Diffie-Hellman connections, we wished to ensure that we made as few Diffie-Hellman negotions as possible. In order to measure this performance parameter, we started a network, and give it time to settle down, while performing cover traffic. We then measure the average cardinality of the connection pools residing in the peers. This number should preferably be close to 1.
+
+The test was done specifically with 100ms faked latency between peers, and by waiting 2 minutes while cover traffic and network kept generating data. We ran the test for 10 to 100 peers, in increments of 10. A higher number of peers was deemed unnecessary, as peers seemed to have little influence on the cardinality of the connection pools.
+
+(TODO: Indsæt Graf, den er i Grapes)
+
+From this test, we see that we have a cardinality ranging between 1.07 and 1.25, which means that we are generating 7-25\% additional additional connections. The average amount of connection overshooting is very close to 12\% which we deem to be good. Note that the cardinality does not appear rise with an increasing number of peers, and in fact the highest numbers seem to reside at very low peer numbers. We theorise that the high cardinality of low peer numbers might be caused by a greater amount of loops in the RPC call graph, leading to a forced additional connection.
