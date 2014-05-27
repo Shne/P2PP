@@ -52,6 +52,27 @@ KWalker test done!
 time: 54.183175563812256
 total messages: 4967
 
+Flooding test done!
+time: 88.70652294158936
+total messages: 11286
+KWalker test done!
+time: 46.85278820991516
+total messages: 6207
+
+Flooding test done!
+time: 71.75835657119751
+total messages: 11246
+KWalker test done!
+time: 50.186217308044434
+total messages: 6451
+
+Flooding test done!
+time: 63.80472540855408
+total messages: 10046
+KWalker test done!
+time: 356.21333026885986
+total messages: 22630
+
 
 
 ### 150 peers ### (16w, 4s, 64ttl, 2x)
@@ -61,3 +82,85 @@ total messages: 8954
 KWalker test done!
 time: 53.97926044464111
 total messages: 4757
+
+Flooding test done!
+time: 59.45447635650635
+total messages: 9586
+KWalker test done!
+time: 53.90408277511597
+total messages: 5521
+
+Flooding test done!
+time: 59.130088806152344
+total messages: 9870
+KWalker test done!
+time: 46.42940354347229
+total messages: 5236
+
+Flooding test done!
+time: 57.050050497055054
+total messages: 9832
+KWalker test done!
+time: 243.03917622566223
+total messages: 17198
+
+Flooding test done!
+time: 49.6924991607666
+total messages: 9024
+KWalker test done!
+time: 67.44236350059509
+total messages: 6640
+
+
+
+
+### 125 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 42.847639322280884
+total messages: 7423
+KWalker test done!
+time: 45.49782395362854
+total messages: 4674
+
+Flooding test done!
+time: 45.338139295578
+total messages: 7994
+KWalker test done!
+time: 109.72941470146179
+total messages: 11024
+
+Flooding test done!
+time: 45.338139295578
+total messages: 7994
+KWalker test done!
+time: 109.72941470146179
+total messages: 11024
+
+Flooding test done!
+time: 41.53654146194458
+total messages: 7060
+KWalker test done!
+time: 64.18875026702881
+total messages: 6061
+
+Flooding test done!
+time: 38.89993166923523
+total messages: 7470
+KWalker test done!
+time: 61.02875757217407
+total messages: 5513
+
+
+### 100 peers ### (16w, 4s, 64ttl, 2x) 
+Flooding test done!
+time: 32.15385627746582
+total messages: 6326
+KWalker test done!
+time: 52.48566269874573
+total messages: 4176
+
+
+
+
+
+
