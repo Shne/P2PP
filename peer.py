@@ -34,7 +34,7 @@ import base64
 
 from hashcash import mint, check
 
-PoW_bits = 16
+PoW_bits = 0
 
 #########################
 # Classes for safer RPC #
