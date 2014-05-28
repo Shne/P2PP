@@ -10,43 +10,43 @@ Warning--empty journal in HashCash
 Warning--empty journal in bitmessage
 You've used 9 entries,
             2481 wiz_defined-function locations,
-            623 strings with 6106 characters,
-and the built_in function-call counts, 3793 in all, are:
-= -- 350
-> -- 153
-< -- 12
-+ -- 61
-- -- 43
-* -- 251
-:= -- 575
-add.period$ -- 37
+            621 strings with 6071 characters,
+and the built_in function-call counts, 3709 in all, are:
+= -- 336
+> -- 159
+< -- 11
++ -- 63
+- -- 45
+* -- 256
+:= -- 573
+add.period$ -- 36
 call.type$ -- 9
 change.case$ -- 18
 chr.to.int$ -- 9
 cite$ -- 13
-duplicate$ -- 213
-empty$ -- 350
-format.name$ -- 62
-if$ -- 845
+duplicate$ -- 203
+empty$ -- 338
+format.name$ -- 64
+if$ -- 813
 int.to.chr$ -- 1
 int.to.str$ -- 10
 missing$ -- 9
 newline$ -- 59
 num.names$ -- 29
-pop$ -- 89
+pop$ -- 84
 preamble$ -- 1
 purify$ -- 9
 quote$ -- 0
-skip$ -- 142
+skip$ -- 134
 stack$ -- 0
-substring$ -- 154
-swap$ -- 50
-text.length$ -- 5
+substring$ -- 149
+swap$ -- 42
+text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 63
 warning$ -- 4
-while$ -- 32
+while$ -- 31
 width$ -- 0
-write$ -- 135
+write$ -- 134
 (There were 5 warnings)

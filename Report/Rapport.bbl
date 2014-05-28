@@ -54,12 +54,11 @@ Adam Back.
 \newblock Hashcash - a denial of service counter-measure.
 \newblock 2002.
 
-\bibitem[Clarke et~al.(2001)Clarke, Sandberg, Wiley, and Hong]{freenet}
-Ian Clarke, Oskar Sandberg, Brandon Wiley, and Theodore~W Hong.
-\newblock Freenet: A distributed anonymous information storage and retrieval
-  system.
-\newblock In \emph{Designing Privacy Enhancing Technologies}, pages 46--66.
-  Springer, 2001.
+\bibitem[Clarke et~al.(2002)Clarke, Miller, Hong, Sandberg, and Wiley]{freenet}
+Ian Clarke, Scott~G Miller, Theodore~W Hong, Oskar Sandberg, and Brandon Wiley.
+\newblock Protecting free expression online with freenet.
+\newblock \emph{Internet Computing, IEEE}, 6\penalty0 (1):\penalty0 40--49,
+  2002.
 
 \bibitem[Warren(2012)]{bitmessage}
 Jonathan Warren.
