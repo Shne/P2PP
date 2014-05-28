@@ -159,8 +159,143 @@ KWalker test done!
 time: 52.48566269874573
 total messages: 4176
 
+Flooding test done!
+time: 33.74869728088379
+total messages: 6210
+KWalker test done!
+time: 90.3554458618164
+total messages: 5736
+
+Flooding test done!
+time: 33.545918703079224
+total messages: 6284
+KWalker test done!
+time: 45.874462842941284
+total messages: 3341
+
+Flooding test done!
+time: 35.00505447387695
+total messages: 6378
+KWalker test done!
+time: 148.09822344779968
+total messages: 7544
+
+Flooding test done!
+time: 30.7283296585083
+total messages: 5977
+KWalker test done!
+time: 55.44146752357483
+total messages: 4399
 
 
 
+### 75 peers ### (16w, 4s, 64ttl, 2x) 
+Flooding test done!
+time: 27.36759662628174
+total messages: 4870
+KWalker test done!
+time: 116.13309335708618
+total messages: 7935
+
+Flooding test done!
+time: 25.645032167434692
+total messages: 4364
+KWalker test done!
+time: 50.24503231048584
+total messages: 3379
+
+Flooding test done!
+time: 25.839080333709717
+total messages: 4930
+KWalker test done!
+time: 70.1475727558136
+total messages: 4476
+
+Flooding test done!
+time: 28.322636365890503
+total messages: 4980
+KWalker test done!
+time: 70.67696046829224
+total messages: 5281
+
+Flooding test done!
+time: 21.53789448738098
+total messages: 4750
+KWalker test done!
+time: 75.25794291496277
+total messages: 3974
 
 
+### 50 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 16.190306663513184
+total messages: 2688
+KWalker test done!
+time: 44.45225954055786
+total messages: 2372
+
+Flooding test done!
+time: 14.100574016571045
+total messages: 2420
+KWalker test done!
+time: 46.377822160720825
+total messages: 3006
+
+Flooding test done!
+time: 18.171590566635132
+total messages: 3058
+KWalker test done!
+time: 44.96772909164429
+total messages: 3011
+
+Flooding test done!
+time: 20.287147045135498
+total messages: 3170
+KWalker test done!
+time: 45.22929406166077
+total messages: 2698
+
+Flooding test done!
+time: 16.830374717712402
+total messages: 2810
+KWalker test done!
+time: 48.750656604766846
+total messages: 3699
+
+
+
+### 25 peers ### (16w, 4s, 64ttl, 2x)
+Flooding test done!
+time: 15.893794536590576
+total messages: 1410
+KWalker test done!
+time: 50.656776428222656
+total messages: 1806
+
+Flooding test done!
+time: 13.541654586791992
+total messages: 1690
+KWalker test done!
+time: 60.31541037559509
+total messages: 2739
+
+Flooding test done!
+time: 13.681371927261353
+total messages: 1430
+KWalker test done!
+time: 46.54829478263855
+total messages: 2835
+
+Flooding test done!
+time: 12.139837741851807
+total messages: 1510
+KWalker test done!
+time: 50.02970218658447
+total messages: 1651
+
+Flooding test done!
+time: 13.879181623458862
+total messages: 1950
+KWalker test done!
+time: 53.1502206325531
+total messages: 2353
