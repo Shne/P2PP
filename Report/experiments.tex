@@ -6,9 +6,13 @@ We prevent sybil attacks by enforcing a strict requirement of proof of work on p
 
 Note that our network enforces a 120 second maximum limit on the age of such proofs of work, to further limit the effectiveness of sybil attacks.
 
-(TODO: Insert graph, iz in Grapes folder)
+\begin{figure}
+\caption{Proof of Work}
+\label{graphs_pow}
+\includegraphics[width=\textwidth]{../Grapes/proof_of_work_graph.png}
+\end{figure}
 
-We see, that with a proof of work requirement of 20 bits, it becomes infeasible to create much more than 40 peers, while more than 90 peers can effectively be created at 12 bits. In reality, one might wish to make the number of bits even higher.
+We see in Figure~\ref{graphs_pow} that with a proof of work requirement of 20 bits, it becomes infeasible to create much more than 40 peers, while more than 90 peers can effectively be created at 12 bits. In reality, one might wish to make the number of bits even higher.
 
 It should be noted, that theoretically, the amount of time required should grow by 16 each time we increase the number of bits by 4. The reason our test shows nowhere near this huge increase is likely that the peers simply get more starved for connections, and form a much sparser network. This means that it is still possible to connect quite a few sybils to the network, but they will have a lesser effect on the other peers, due to their low connectivity.
 
@@ -18,9 +22,23 @@ As described in section~\ref{subsec:base_system}, the k-walker algorithm impleme
 The required parameters were the starting values of wait time and TTL as well as how many walkers to send in parallel each time. Tested values of starting wait time include 0.5, 1, 2, 4, 8 and tested starting values of TTL include 8, 16, 32, 64, 128 and the tested numbers of walkers to send out time include 1, 2, 4, 8, 16, 32. Since each test took quite a while and had to be repeated several times to try different network layouts, we didn't test all possible combinations of the values but used our intuition and understanding of the effect of the values to zero in on some good values to test further. We found that the network layout had a huge effect on the time and number of passed messages in the network to send a single message and receive verification of delivery. We omit presenting the data from this experiments as not even close to every combination of the parameters were tested, making graphing the values useless, and not every test was written down. We ended up using a starting wait time of 4 seconds and starting TTL of 64 and send out 16 walkers in parallel.
 
 \subsection{Flooding vs. k-walkers}
-We tested the time and internal messages passed in the whole network by having two peers join a network of varying size and sending 10 messages from one to another, waiting for the acknowledgement of the previous message before sending the next. This test was then repeated to test various network layouts. These tests were performed with Proof-of-Work turned off and no artificial latency introduced in the system.
+We tested the time and internal messages passed in the whole network by having two peers join a network of varying size and sending 10 messages from one to another, waiting for the acknowledgement of the previous message before sending the next. This test was then repeated to test various network layouts. These tests were performed with Proof-of-Work turned off and no artificial latency introduced in the system in network of size increments of 25 peers.
 
 We weren't able to have networks involving more than 230 or so peers running on the same machine without random peers dying or at least not responding fast enough so we limit our testing to a max network size of 200.
+
+\begin{figure}
+\caption{Flooding vs. K-Walker: Time}
+\label{graph_fvsk_t}
+\includegraphics[width=\textwidth]{../Grapes/flooding_vs_kwalker_time_graph.png}
+\end{figure}
+
+\begin{figure}
+\caption{Flooding vs. K-Walker: Messages}
+\label{graph_fvsk_m}
+\includegraphics[width=\textwidth]{../Grapes/flooding_vs_kwalker_messages_graph.png}
+\end{figure}
+
+TODO: explain more about these Figure~\ref{graph_fvsk_t} and Figure~\ref{graph_fvsk_m}
 
 \subsection{Cardinality of Diffie-Hellman Pools}
 
@@ -34,4 +52,4 @@ The test was done specifically with 100ms faked latency between peers, and by wa
 \includegraphics[width=\textwidth]{../Grapes/DH_pools_cardinality_graph.png}
 \end{figure}
 
-From this test, we see that we have a cardinality ranging between 1.07 and 1.25, which means that we are generating 7-25\% additional additional connections. The average amount of connection overshooting is very close to 12\% which we deem to be good. Note that the cardinality does not appear rise with an increasing number of peers, and in fact the highest numbers seem to reside at very low peer numbers. We theorise that the high cardinality of low peer numbers might be caused by a greater amount of loops in the RPC call graph, leading to a forced additional connection.
+From this test, in Figure~\ref{graph_cardinality}, we see that we have a cardinality ranging between 1.07 and 1.25, which means that we are generating 7-25\% additional additional connections. The average amount of connection overshooting is very close to 12\% which we deem to be good. Note that the cardinality does not appear rise with an increasing number of peers, and in fact the highest numbers seem to reside at very low peer numbers. We theorise that the high cardinality of low peer numbers might be caused by a greater amount of loops in the RPC call graph, leading to a forced additional connection.
