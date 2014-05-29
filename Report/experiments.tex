@@ -17,6 +17,7 @@ We see in Figure~\ref{graphs_pow} that with a proof of work requirement of 20 bi
 It should be noted, that theoretically, the amount of time required should grow by 16 each time we increase the number of bits by 4. The reason our test shows nowhere near this huge increase is likely that the peers simply get more starved for connections, and form a much sparser network. This means that it is still possible to connect quite a few sybils to the network, but they will have a lesser effect on the other peers, due to their low connectivity.
 
 \subsection{Finding optimal k-walker parameters}
+\label{subsec:k_opti_params}
 As described in section~\ref{subsec:base_system}, the k-walker algorithm implements an eventual delivery guarantee as long as sender remains connected to the network by sending out walkers with exponentially increasing TTL at exponentially increasing intervals. Before doing the experiments comparing flooding and k-walkers we needed to find some optimal or at least pretty good parameters for this.
 
 The required parameters were the starting values of wait time and TTL as well as how many walkers to send in parallel each time. Tested values of starting wait time include 0.5, 1, 2, 4, 8 and tested starting values of TTL include 8, 16, 32, 64, 128 and the tested numbers of walkers to send out time include 1, 2, 4, 8, 16, 32. Since each test took quite a while and had to be repeated several times to try different network layouts, we didn't test all possible combinations of the values but used our intuition and understanding of the effect of the values to zero in on some good values to test further. We found that the network layout had a huge effect on the time and number of passed messages in the network to send a single message and receive verification of delivery. We omit presenting the data from this experiments as not even close to every combination of the parameters were tested, making graphing the values useless, and not every test was written down. We ended up using a starting wait time of 4 seconds and starting TTL of 64 and send out 16 walkers in parallel.
@@ -27,18 +28,26 @@ We tested the time and internal messages passed in the whole network by having t
 We weren't able to have networks involving more than 230 or so peers running on the same machine without random peers dying or at least not responding fast enough so we limit our testing to a max network size of 200.
 
 \begin{figure}
-\caption{Flooding vs. K-Walker: Time}
+\caption{K-Walker / Flooding: Time}
 \label{graph_fvsk_t}
 \includegraphics[width=\textwidth]{../Grapes/flooding_vs_kwalker_time_graph.png}
 \end{figure}
 
 \begin{figure}
-\caption{Flooding vs. K-Walker: Messages}
+\caption{K-Walker / Flooding: Messages}
 \label{graph_fvsk_m}
 \includegraphics[width=\textwidth]{../Grapes/flooding_vs_kwalker_messages_graph.png}
 \end{figure}
 
-TODO: explain more about these Figure~\ref{graph_fvsk_t} and Figure~\ref{graph_fvsk_m}
+In Figure~\ref{graph_fvsk_t} we have graphed how the k-walker algorithm performs compared to flooding by dividing the time of the k-walker algorithm with the flooding algorithm run on the same network, then averaging this over 5 runs on different network of same size for a value in the final graph. The same was done for Figure~\ref{graph_fvsk_m}, except the number of messages was used instead.
+
+We see in Figure~\ref{graph_fvsk_t} that kwalker in general takes more time than flooding, but also that its relative performance increases noticeably as network size grows. This suggests that the kwalker likely will outperform flooding in larger networks and, looking at the trendline, even in networks not much larger than our test sizes, perhaps at about 225 peers. In a realistic setting such as one of our use cases, we expect the network to reach much larger sizes, perhaps in the thousands, and so we expect a kwalker algorithm to perform much better than flooding time-wise in real world use.
+
+In Figure~\ref{graph_fvsk_m} we see that the kwalker algorithm in general either outperforms or performs as well as flooding in regards to number of messages when ignoring very small network sizes.
+If we had used different parameters for the kwalker algorithm, such as sending fewer walkers in parallel, we find it likely that kwalker would also have outperformed flooding at small network sizes. different parameters would also likely have been able to make the kwalker algorithm outperform flooding even more in larger networks
+The graph seems to oscillate, only barely showing a trend towards better performance at larger networks. We explain this by the fact that number of messages, as well as time, fluctuated greatly in our tests depending on the configuration of the exact network it was running on. It is also sad that we couldn't test on network of a greater size than about 200 peers, as we expect the kwalker to be better at larger networks and we are unable to show it.
+
+It should be noted that the kwalker algorithm waits a full 4 seconds after receiving no verification of delivery before sending out more walkers, and this will artificially inflate the time it takes on smaller networks where the wait time could easily be shorter as a verification walker will have a smaller network to traverse. Another disadvantage for the kwalker algorithm in this test, that also affects the amount of messages, is that it has a number of parameters which cannot be optimal for every network and network size, and we only spent a limited time trying to find some good parameters as can be seen in section~\ref{subsec:k_opti_params}.
 
 \subsection{Cardinality of Diffie-Hellman Pools}
 
