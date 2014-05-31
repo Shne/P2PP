@@ -1,0 +1,6 @@
+\section{Conclusion} We managed to build a secure network for transmitting chat messages, using a fairly generic unstructured network as the base. 
+The system is quite usable, and can send messages quickly enough to keep a conversation going, while still being secure against most attacks. We did this by following the design guidelines alluded to in the use-case, along with a much stricter plan specified in our internal design documents.
+
+Not only does  the system work, but we also managed to show experimentally that using proof-of-work for joining the network is a feasible method of preventing large-scale Sybil attacks. We have also shown how Diffie-Hellman encryption can be applied across a peer-to-peer network, with very few additional key negotiations. Finally, we have measured the performance of flooding versus k-walkers when very little information can be associated with the walkers, and have seen that as the network grows larger, k-walkers appear to still be competitive in terms of message count and latency.
+
+We consider the project a success, since we reached our goals without any major hiccups, but we acknowledge that the system is still far from finished.
