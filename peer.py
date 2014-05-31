@@ -34,7 +34,7 @@ import base64
 
 from hashcash import mint, check
 
-PoW_bits = 20
+PoW_bits = 12
 
 
 #########################
@@ -1020,7 +1020,7 @@ class Peer:
                     self.messagesDict[mhash] = ttl
                     unnoncedMessage = unnonceMsg(decryptedMessage, nonce)
                     print('Received Message from ' + self.checkSender(decryptedMessage, sig) + ': ' +  unnoncedMessage.decode('utf-8')) #Get binary data from XMLRPC wrapper, decrypt it, and decode it from UTF-8 from
-                # time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time
+                time.sleep(random.randrange(0, 5)) #Stop, traffic analysis time
 
                 digest = SHA256.new()
                 digest.update(decryptedMessage)

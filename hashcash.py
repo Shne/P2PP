@@ -103,7 +103,7 @@ def _mint(challenge, bits):
         counter += 1
 
 def check(stamp, resource=None, bits=16,
-                 check_expiration=None, ds_callback=None):
+                 check_expiration=120, ds_callback=None):
     """Check whether a stamp is valid
 
     Optionally, the stamp may be checked for a specific resource, and/or
