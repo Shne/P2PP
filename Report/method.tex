@@ -29,7 +29,7 @@ All chat messages in the system may or may not be signed by the sender. If the s
 
 Both types of signatures are done according to \textbf{PKCS\#1! v1.5} \citep{PKCS}.
 
-In the case of the sender signing a message, we send a signature of the plain-text message along with the encrypted message. This ensures, that only after obtaining the decrypted message will it be possible to verify the signature, and that we keep the identity of the sender hidden to anyone except the recipient, and that the recipient can securely verify the sender given his public key.
+In the case of the sender signing a message, we send a signature of the plain-text message along with the encrypted message. This ensures it will only be possible to verify the signature after obtaining the decrypted message, and that we keep the identity of the sender hidden to anyone except the recipient, and that the recipient can securely verify the sender given his public key.
 
 When verifying the delivery of a message the receiver returns a signed digest of the plaintext message, which is verified by the sender. This ensures that the sender has received the message, as he is the only one able to provide a valid signature. If the peer is using flooding we simply return this value as part of the xml-rpc call, while we answer back using a k-walker in the case that we receive a message by k-walker. Given a small random delay, it becomes difficult to determine whether a message was received by any given peer, or one of his neighbours. 
 
