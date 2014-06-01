@@ -1,52 +1,52 @@
-This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2013/W32TeX)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: Rapport.aux
 The style file: unsrtnat.bst
 Database file #1: Rapport.bib
-Warning--I didn't find a database entry for "XMLRPCBAD"
 Warning--empty journal in bitmessage
 Warning--empty journal in P2PN
 Warning--empty journal in PKCS
 Warning--empty journal in HashCash
-You've used 9 entries,
+Warning--empty journal in XMLRPCBAD
+You've used 10 entries,
             2481 wiz_defined-function locations,
-            621 strings with 6073 characters,
-and the built_in function-call counts, 3729 in all, are:
-= -- 335
-> -- 165
-< -- 10
-+ -- 65
-- -- 47
-* -- 262
-:= -- 579
-add.period$ -- 36
-call.type$ -- 9
-change.case$ -- 18
-chr.to.int$ -- 9
-cite$ -- 13
-duplicate$ -- 203
-empty$ -- 338
-format.name$ -- 64
-if$ -- 815
+            624 strings with 6186 characters,
+and the built_in function-call counts, 3986 in all, are:
+= -- 356
+> -- 172
+< -- 11
++ -- 69
+- -- 49
+* -- 273
+:= -- 621
+add.period$ -- 39
+call.type$ -- 10
+change.case$ -- 20
+chr.to.int$ -- 10
+cite$ -- 15
+duplicate$ -- 221
+empty$ -- 366
+format.name$ -- 67
+if$ -- 869
 int.to.chr$ -- 1
-int.to.str$ -- 10
-missing$ -- 9
-newline$ -- 59
-num.names$ -- 29
-pop$ -- 84
+int.to.str$ -- 11
+missing$ -- 10
+newline$ -- 64
+num.names$ -- 32
+pop$ -- 95
 preamble$ -- 1
-purify$ -- 9
+purify$ -- 10
 quote$ -- 0
-skip$ -- 132
+skip$ -- 143
 stack$ -- 0
-substring$ -- 149
-swap$ -- 42
+substring$ -- 151
+swap$ -- 43
 text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 63
-warning$ -- 4
-while$ -- 31
+type$ -- 70
+warning$ -- 5
+while$ -- 33
 width$ -- 0
-write$ -- 134
+write$ -- 145
 (There were 5 warnings)
