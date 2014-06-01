@@ -4,7 +4,7 @@ In order to operate a peer in the network, one must rely on either python script
 
 We here explain the commands required to operate the peer using the command line interface. Scripting directly against peer class is left as an exercise for the reader.
 
-Note that the peer still supports most of the commands of the original network (TODO:Ref P2PN paper).
+Note that the peer still supports most of the commands of the original network \citep{P2PN}.
 
 The commands are as follows:
 
@@ -16,16 +16,16 @@ After joining the network, the peer will be ready to add keys, and chat. Please 
 \item[secret \textit{private\_key}]
 Load the given private key from a local file, and set is as the current key used for decrypting and signing messages. 
 This is required in order to receive messages encrypted with the corresponding public key, and to sign messages sent from the local peer.
-Note that the key must be an RSA private key in the \textit{pem} format.
+Note that the key must be a RSA private key in the \textit{pem} format.
 
 \item[friend \textit{name public\_key}]
 Load the given public key from a local file, and associate it with the alias provided by the name parameter. 
 This is required in order to send messages to the peer with the corresponding private key, and to identify that peer as a sender.
-Note that the key must be an RSA public key in the \textit{pem} format.
+Note that the key must be a RSA public key in the \textit{pem} format.
 
 \item[publish \textit{public\_key}]
-Make the given public available for retrieval through the peer to peer network. Shortly after entering this command the peer will display a hash of your key, which you can share. This allows other peers to download your public key through the network if the have the corresponding hash string.
-Note that the key must be an RSA public key in the \textit{pem} format.
+Make the given public key available for retrieval through the peer to peer network. Shortly after entering this command the peer will display a hash of your key, which you can share. This allows other peers to download your public key through the network if they have the corresponding hash string.
+Note that the key must be a RSA public key in the \textit{pem} format.
 
 \item[friend \textit{name hash}]
 Fetches the key stored in the network under the given hash, and checks for hash validity of the key. If successful, the public key retrieved will be associated with the alias specified in the name parameter.

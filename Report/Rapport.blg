@@ -1,13 +1,13 @@
-This is BibTeX, Version 0.99d (TeX Live 2013/W32TeX)
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: Rapport.aux
 The style file: unsrtnat.bst
 Database file #1: Rapport.bib
 Warning--I didn't find a database entry for "XMLRPCBAD"
+Warning--empty journal in bitmessage
 Warning--empty journal in P2PN
 Warning--empty journal in PKCS
 Warning--empty journal in HashCash
-Warning--empty journal in bitmessage
 You've used 9 entries,
             2481 wiz_defined-function locations,
             621 strings with 6071 characters,
