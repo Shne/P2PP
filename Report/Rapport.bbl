@@ -5,8 +5,20 @@
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Kris V.~Ebbesen and Pedersen.(2014)]{P2PN}
-Jan H.~Knudsen Kris V.~Ebbesen and Roland~L. Pedersen.
+\bibitem[Clarke et~al.(2002)Clarke, Miller, Hong, Sandberg, and Wiley]{freenet}
+Ian Clarke, Scott~G Miller, Theodore~W Hong, Oskar Sandberg, and Brandon Wiley.
+\newblock Protecting free expression online with freenet.
+\newblock \emph{Internet Computing, IEEE}, 6\penalty0 (1):\penalty0 40--49,
+  2002.
+
+\bibitem[Warren(2012)]{bitmessage}
+Jonathan Warren.
+\newblock Bitmessage: A peer-to-peer message authentication and delivery
+  system.
+\newblock 2012.
+
+\bibitem[Ebbesen et~al.(2014)Ebbesen, Knudsen, and Pedersen]{P2PN}
+Kris~V. Ebbesen, Jan~H. Knudsen, and Roland~L. Pedersen.
 \newblock Peer to peer networks.
 \newblock 2014.
 
@@ -53,17 +65,5 @@ Michael~J Freedman and Robert Morris.
 Adam Back.
 \newblock Hashcash - a denial of service counter-measure.
 \newblock 2002.
-
-\bibitem[Clarke et~al.(2002)Clarke, Miller, Hong, Sandberg, and Wiley]{freenet}
-Ian Clarke, Scott~G Miller, Theodore~W Hong, Oskar Sandberg, and Brandon Wiley.
-\newblock Protecting free expression online with freenet.
-\newblock \emph{Internet Computing, IEEE}, 6\penalty0 (1):\penalty0 40--49,
-  2002.
-
-\bibitem[Warren(2012)]{bitmessage}
-Jonathan Warren.
-\newblock Bitmessage: A peer-to-peer message authentication and delivery
-  system.
-\newblock 2012.
 
 \end{thebibliography}
