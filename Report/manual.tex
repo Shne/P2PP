@@ -1,5 +1,22 @@
 \section{Manual of Operations}
 
+In order to use the project, you will need \texttt{Python 3.3} with the \texttt{PyCrypto} Module installed.
+
+Included in the pre-package solution are the following files;
+\begin{description}
+\item[peer.py] The base peer class, this provides the logic for the peers of the network.
+\item[interactive\_peer.py] The command-line interface for the peer.
+\item[setup.py] A script generating a large amount of peers.
+\item[hashcash.py] The hashcash dependency \citep{HashCash}.
+\item[public.pem, private.pem, public2.pem, private2.pem] Sample 2048-bit RSA keys.
+\item[DH.pem] Precomputed Diffie-Hellman data. 
+\end{description}
+
+In order to start a peer, use the \texttt{interactive\_peer.py} python file.
+
+
+
+\subsection{Operating the Command-Line Interface}
 In order to operate a peer in the network, one must rely on either python scripting against the peer class of the source code, or the supplied command line interface.
 
 We here explain the commands required to operate the peer using the command line interface. Scripting directly against peer class is left as an exercise for the reader.
