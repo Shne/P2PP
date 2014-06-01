@@ -63,23 +63,17 @@ To keep the network stable, and free from Sybil-style attacks, we use a proof of
 The proof of work system is based on HashCash \citep{HashCash}, and requires a peer to generate a partial hash collision with the timestamped resource, using the SHA-256 hashing algorithm. How large a collision and how new a time stamp must be is fully configurable.
 
 A proof of work is currently required in 2 circumstances.
-
-The first is when a peer wishes to join the neighbourhood of another peer. In requiring a proof of work for joining or moving within the network, we make Sybil and Eclipse attacks less likely, while imposing little to no hindrance on long-term stable peers.
-
+The first is when a peer wishes to join the neighbourhood of another peer. In requiring a proof of work for joining or moving within the network, we make Sybil and Eclipse attacks less effective, while imposing little to no hindrance on long-term stable peers.
 The second proof of work is required when a peer wishes to send a message. This is to deter spamming of the network, and to prevent malicious peers from forcing other peers to spend an unwanted amount of time trying to decrypt messages, or drown a single peer in messages after having obtained its public key.
-
-Note that the standard settings for the required bits of a proof of work are currently quite low, in order to allow rapid testing of the network
+We have used either few or no required bits of a proof of work in our testing, unless specifically testing the proof of work, in order to allow rapid testing of the network.
 
 \subsection{Public Key Distribution}
 
 When a peer wishes to communicate chat messages to another peer, it is required to know the public key of the recipient.
-
 This public key can be supplied directly by the sender, indicating that the key has been distributed securely outside of the network. In this case, the key is simply loaded from a provided file.
 
 The network also offers the option of publishing public keys using the underlying peer-to-peer networks ability to share resources. When doing this, the public key is read, and stored in the network as a resource using the base64 encoding of its SHA-256 hash as its name. The key can then either be fetched and stored normally as a resource by other peers, or loaded directly into the public storage of other peers.
-
 Any peer that loads the key directly will verify its hash as it does so.
-
 The result is a tag (44 characters long), that can be shared much easier than an entire public key.
 
 \subsection{Limiting RPC Call Availability}
