@@ -10,15 +10,15 @@ Warning--empty journal in PKCS
 Warning--empty journal in HashCash
 You've used 9 entries,
             2481 wiz_defined-function locations,
-            621 strings with 6071 characters,
-and the built_in function-call counts, 3709 in all, are:
-= -- 336
-> -- 159
-< -- 11
-+ -- 63
-- -- 45
-* -- 256
-:= -- 573
+            621 strings with 6073 characters,
+and the built_in function-call counts, 3729 in all, are:
+= -- 335
+> -- 165
+< -- 10
++ -- 65
+- -- 47
+* -- 262
+:= -- 579
 add.period$ -- 36
 call.type$ -- 9
 change.case$ -- 18
@@ -27,7 +27,7 @@ cite$ -- 13
 duplicate$ -- 203
 empty$ -- 338
 format.name$ -- 64
-if$ -- 813
+if$ -- 815
 int.to.chr$ -- 1
 int.to.str$ -- 10
 missing$ -- 9
@@ -37,7 +37,7 @@ pop$ -- 84
 preamble$ -- 1
 purify$ -- 9
 quote$ -- 0
-skip$ -- 134
+skip$ -- 132
 stack$ -- 0
 substring$ -- 149
 swap$ -- 42

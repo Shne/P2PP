@@ -17,8 +17,13 @@ Jonathan Warren.
   system.
 \newblock 2012.
 
+<<<<<<< HEAD
+\bibitem[Kris V.~Ebbesen and Pedersen.(2014)]{P2PN}
+Jan H.~Knudsen Kris V.~Ebbesen and Roland~L. Pedersen.
+=======
 \bibitem[Ebbesen et~al.(2014)Ebbesen, Knudsen, and Pedersen]{P2PN}
 Kris~V. Ebbesen, Jan~H. Knudsen, and Roland~L. Pedersen.
+>>>>>>> 480c92b683a1335f1bbf6ccd6c0459b871a347b9
 \newblock Peer to peer networks.
 \newblock 2014.
 

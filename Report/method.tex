@@ -7,7 +7,7 @@ The system described is built atop the unstructured network developed during the
 
 The choice of this network was made based on its simplicity and extendibility, and due to the fact that unstructured networks require little information about the peers involved, making it difficult to track which peers are doing what. 
 
-To make the system guarantee an eventual delivery of the message if the sender remains connected, we extended the k-walker algorithm to work somewhat akin to the expanding ring search algorithm wherein the TTL value is increased and the search repeated when a search fails. We send out 4 walkers and wait for a while, if no acknowledgement has been received after the wait, another 4 walkers are sent with double the TTL and double the wait time. Starting values of TTL and wait time is 32 and 1 second, respectively, which we found through experimentation and measuring. Other values might be better in larger or smaller systems.
+To make the system guarantee an eventual delivery of the message if the sender remains connected, we extended the k-walker algorithm to work somewhat akin to the expanding ring search algorithm wherein the TTL value is increased and the search repeated when a search fails. We send out a number of walkers and wait for a while, if no acknowledgement has been received after the wait, another set of walkers are sent with double the TTL and double the wait time. Starting values of TTL and wait time is configurable, and good values will be found through experimentation and measuring.
 
 Note that the techniques used to extend the network could be applied to most unstructured networks, and would probably work just as well on the GIA network.
 
