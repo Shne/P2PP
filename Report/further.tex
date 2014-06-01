@@ -1,10 +1,9 @@
 \section{Further Work}
 
 Throughout this project, we have managed to meet our baseline goals for the system, and make a working command line chat client that is heavily secured. However, there is still much to be done before the system is enterprise-strength ready.
-
 Most importantly is a proper user interface. The current command line interface is not entirely intuitive, and lacks proper conversation threading.
 
-Optimized k-walkers would be nice. Currently our k-walkers are very basic, due to the lack of information about sender, receiver and content. Since we lack a lot of the information usually used to optimize k-walkers, it might prove difficult to make them perform better than they currently do, but it would be worth a try.
+Optimized k-walkers, such as Adaptive Probabilistic, could be a huge improvement. Currently our k-walkers are very basic, due to the lack of information about sender, receiver and content. Since we lack a lot of the information usually used to optimize k-walkers, it might prove difficult to make them perform better than they currently do, but it would be worth a try. Some of the available optimizations for k-walkers might also compromise the security of the system by introducing exploitable behaviour of the k-walkers.
 
 A better cover traffic scheme could be implemented. The current cover traffic is completely random, and this leads to a slight possibility for traffic analysis against very active peers. Using constant-rate cover traffic would be preferable.
 In order to avoid eclipse attacks, it would be quite a good idea to avoid peers from the same subnet. Such a thing could be easily  done by denying neighbour request from peers in an  already connected subnet.
