@@ -9,8 +9,6 @@ peer.py
 	main implementation file
 private.pem, private2.pem, public.pem, public2.pem
 	public-private key pairs. included to make testing easier
-Rapport.pdf
-	the report
 README.txt
 	this file
 setup.py
